@@ -38,6 +38,23 @@ namespace OSPTests.TestParallelism
         }
 
         [Fact]
+        public async System.Threading.Tasks.Task TestParallelMoreStreams()
+        {
+            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(0);
+            await breaker.Reset();
+            var conf = new TopologyConfiguration();
+            var mgr = new TopologyManager(conf);
+            var ds = mgr.AddSource(typeof(TestSource), 3);
+            ds.Sink(typeof(TestSink1), 3);
+            JobManager jmgr = new JobManager();
+            await jmgr.StartJob(mgr, _cluster.Client);
+            Thread.Sleep(1000);
+            var result = await breaker.GetBreaking();
+            //must break because messages go 1,2,1,2 and there are 3 sinks 1->first 2->second 1->third 2->first = fail 
+            Assert.True(result);
+        }
+
+        [Fact]
         public async System.Threading.Tasks.Task TestParallelFail1Async()
         {
             var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(0);
