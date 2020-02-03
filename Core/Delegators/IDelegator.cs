@@ -4,6 +4,7 @@ using System.Text;
 
 namespace CoreOSP.Delegators
 {
+    [Obsolete]
     public interface IDelegator
     {
         void SetNextOperators(List<(Guid, Type)> op);

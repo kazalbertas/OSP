@@ -4,6 +4,7 @@ using System.Text;
 
 namespace CoreOSP.Delegators
 {
+    [Obsolete]
     public class RoundRobinDelegator : IDelegator
     {
         private List<(Guid, Type)> nextOp = new List<(Guid, Type)>();

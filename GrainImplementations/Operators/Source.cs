@@ -33,16 +33,14 @@ namespace GrainImplementations.Operators
 
         public async Task InitSource()
         {
-            if ((NextIds.Count == 0 || NextType == null))
+            if ((NextStreamIds.Count == 0 || NextStreamGuid == null))
             {
-                var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetNext(this.GetPrimaryKey(), GetType());
+                var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetOutputStreams(this.GetPrimaryKey(), GetType());
                 if (result.HasValue)
                 {
-                    NextIds = result.Value.Item1;
-                    NextType = result.Value.Item2;
-                    var op = new List<(Guid, Type)>();
-                    NextIds.ForEach(x => op.Add((x, NextType)));
-                    _delegator.SetNextOperators(op);
+                    NextStreamGuid = result.Value.Item1;
+                    NextStreamIds = result.Value.Item2;
+                    _partitioner.SetOutputStreams(NextStreamGuid, NextStreamIds);
                 }
                 else throw new ArgumentNullException("No next operator found, check topology");
                 // Need to keep null types in case of sink,

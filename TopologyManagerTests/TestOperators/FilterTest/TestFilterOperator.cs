@@ -19,32 +19,35 @@ namespace OSPTests.TestOperators.FilterTest
             _cluster = fixture.Cluster;
         }
 
-        [Fact]
-        public void TestSourceFilterSinkTopology()
-        {
-            var conf = new TopologyConfiguration();
-            var mgr = new TopologyManager(conf);
-            var ds = mgr.AddSource(typeof(TestSource1));
+        //[Fact]
+        //public void TestSourceFilterSinkTopology()
+        //{
+        //    var conf = new TopologyConfiguration();
+        //    var mgr = new TopologyManager(conf);
+        //    var ds = mgr.AddSource(typeof(TestSource1));
 
-            var sourceGuid = ds.OperatorId;
-            Type sourceType = ds.OperatorType;
+        //    var sourceGuid = ds.OperatorGUIDs;
+        //    Type sourceType = ds.OperatorType;
 
-            var df = ds.Filter(typeof(TestFilter));
+        //    var df = ds.Filter(typeof(TestFilter));
 
-            var filterGuid = df.OperatorId;
-            var filterType = df.OperatorType;
+        //    var filterGuid = df.OperatorGUIDs;
+        //    var filterType = df.OperatorType;
 
-            df.Sink(typeof(TestSink1));
+        //    df.Sink(typeof(TestSink1));
 
-            Assert.Equal(sourceGuid, ds.OperatorId);
-            Assert.Equal(sourceType, ds.OperatorType);
+        //    Assert.Equal(filterGuid, df.Prev.OperatorGUIDs);
+        //    Assert.Equal(filterType, df.Prev.OperatorType);
 
-            Assert.Equal(filterGuid, ds.Next.OperatorId);
-            Assert.Equal(filterType, ds.Next.OperatorType);
+        //    Assert.Equal(sourceGuid, df.Prev.Prev.OperatorGUIDs);
+        //    Assert.Equal(sourceType, df.Prev.Prev.OperatorType);
 
-            Assert.Equal(typeof(TestSink1), ds.Next.Next.OperatorType);
-            Assert.Null(ds.Next.Next.Next);
-        }
+        //    Assert.Equal(sourceGuid, ds.OperatorGUIDs);
+        //    Assert.Equal(sourceType, ds.OperatorType);
+
+        //    Assert.Equal(typeof(TestSink1), df.OperatorType);
+
+        //}
 
         [Fact]
         public async System.Threading.Tasks.Task TestSourceFilterSinkRunAsync()
@@ -56,7 +59,7 @@ namespace OSPTests.TestOperators.FilterTest
             ds.Filter(typeof(TestFilter)).Sink(typeof(TestSink1));
 
             JobManager jmgr = new JobManager();
-            await jmgr.StartTestJobAsync(mgr, _cluster.Client);
+            await jmgr.StartJob(mgr, _cluster.Client);
         }
     }
 }

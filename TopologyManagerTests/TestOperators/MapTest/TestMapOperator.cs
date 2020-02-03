@@ -17,32 +17,31 @@ namespace OSPTests.TestOperators.MapTest
             _cluster = fixture.Cluster;
         }
 
-        [Fact]
-        public void TestMapTopology()
-        {
-            var conf = new TopologyConfiguration();
-            var mgr = new TopologyManager(conf);
-            var ds = mgr.AddSource(typeof(TestSource1));
+        //[Fact]
+        //public void TestMapTopology()
+        //{
+        //    var conf = new TopologyConfiguration();
+        //    var mgr = new TopologyManager(conf);
+        //    var ds = mgr.AddSource(typeof(TestSource1));
 
-            var sourceGuid = ds.OperatorId;
-            Type sourceType = ds.OperatorType;
+        //    var sourceGuid = ds.OperatorGUIDs;
+        //    Type sourceType = ds.OperatorType;
 
-            var df = ds.Map(typeof(TestMap));
+        //    var df = ds.Map(typeof(TestMap));
 
-            var mapGuid = df.OperatorId;
-            var mapType = df.OperatorType;
+        //    var mapGuid = df.OperatorGUIDs;
+        //    var mapType = df.OperatorType;
 
-            df.Sink(typeof(TestSink1));
+        //    df.Sink(typeof(TestSink1));
 
-            Assert.Equal(sourceGuid, ds.OperatorId);
-            Assert.Equal(sourceType, ds.OperatorType);
+        //    Assert.Equal(sourceGuid, df.Prev.Prev.OperatorGUIDs);
+        //    Assert.Equal(sourceType, df.Prev.Prev.OperatorType);
 
-            Assert.Equal(mapGuid, ds.Next.OperatorId);
-            Assert.Equal(mapType, ds.Next.OperatorType);
+        //    Assert.Equal(mapGuid, df.Prev.OperatorGUIDs);
+        //    Assert.Equal(mapType, df.Prev.OperatorType);
 
-            Assert.Equal(typeof(TestSink1), ds.Next.Next.OperatorType);
-            Assert.Null(ds.Next.Next.Next);
-        }
+        //    Assert.Equal(typeof(TestSink1), df.OperatorType);
+        //}
 
         [Fact]
         public async System.Threading.Tasks.Task TestMap()
@@ -54,7 +53,7 @@ namespace OSPTests.TestOperators.MapTest
             ds.Map(typeof(TestMap)).Sink(typeof(TestSink1));
 
             JobManager jmgr = new JobManager();
-            await jmgr.StartTestJobAsync(mgr, _cluster.Client);
+            await jmgr.StartJob(mgr, _cluster.Client);
         }
     }
 }

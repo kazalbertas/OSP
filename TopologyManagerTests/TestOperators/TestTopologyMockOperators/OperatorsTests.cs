@@ -10,32 +10,32 @@ namespace OSPTests.TestOperators.TestTopologyMockOperators
 {
     public class OperatorsTests
     {
-        [Fact]
-        public void TestTopologyManager()
-        {
-            var conf = new TopologyConfiguration();
-            var mgr = new TopologyManager(conf);
-            var ds = mgr.AddSource(typeof(MockSource));
+        //[Fact]
+        //public void TestTopologyManager()
+        //{
+        //    var conf = new TopologyConfiguration();
+        //    var mgr = new TopologyManager(conf);
+        //    var ds = mgr.AddSource(typeof(MockSource));
 
-            var sourceGuid = ds.OperatorId;
-            Type sourceType = ds.OperatorType;
+        //    var sourceGuid = ds.OperatorId;
+        //    Type sourceType = ds.OperatorType;
 
-            var df = ds.Filter(typeof(MockFilter));
+        //    var df = ds.Filter(typeof(MockFilter));
 
-            var filterGuid = df.OperatorId;
-            var filterType = df.OperatorType;
+        //    var filterGuid = df.OperatorId;
+        //    var filterType = df.OperatorType;
 
-            df.Sink(typeof(MockSink));
+        //    df.Sink(typeof(MockSink));
 
-            Assert.Equal(sourceGuid, ds.OperatorId);
-            Assert.Equal(sourceType, ds.OperatorType);
+        //    Assert.Equal(sourceGuid, ds.OperatorId);
+        //    Assert.Equal(sourceType, ds.OperatorType);
 
-            Assert.Equal(filterGuid, ds.Next.OperatorId);
-            Assert.Equal(filterType, ds.Next.OperatorType);
+        //    Assert.Equal(filterGuid, ds.Next.OperatorId);
+        //    Assert.Equal(filterType, ds.Next.OperatorType);
 
-            Assert.Equal(typeof(MockSink), ds.Next.Next.OperatorType);
-            Assert.Null(ds.Next.Next.Next);
-        }
+        //    Assert.Equal(typeof(MockSink), ds.Next.Next.OperatorType);
+        //    Assert.Null(ds.Next.Next.Next);
+        //}
 
         [Fact]
         public void TestHashing() 

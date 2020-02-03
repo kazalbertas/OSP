@@ -38,9 +38,10 @@ namespace GrainImplementations.Operators
             
             T item = ProcessMessage(message);
             Data<T> dt = new Data<T>(GetKey(item), item);
-            (var NextOperatorId, var NextOperatorClass) = _delegator.DelegateToProcess(dt.Key);
-            var grain = GrainFactory.GetGrain<IOperator>(NextOperatorId, NextOperatorClass.FullName);
-            grain.Process(dt, GetMetadata());
+            //(var NextOperatorId, var NextOperatorClass) = _par.DelegateToProcess(dt.Key);
+            SendToNextStreamAsync(dt.Key, dt, GetMetadata());
+           // var grain = GrainFactory.GetGrain<IOperator>(NextOperatorId, NextOperatorClass.FullName);
+            //grain.Process(dt, GetMetadata());
             // need to add watermarks
             //return Task.CompletedTask;
         }

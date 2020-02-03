@@ -8,20 +8,33 @@ namespace OSPJobManager
 {
     public class JobManager
     {
-        public async System.Threading.Tasks.Task StartTestJobAsync(TopologyManager tpm, IClusterClient client) 
+        public async System.Threading.Tasks.Task StartJob(TopologyManager tpm, IClusterClient client) 
         {
             await client.GetGrain<IJob>(Guid.NewGuid(), typeof(Job).FullName).StartJob(tpm);
-            foreach (var stream in tpm.Streams) 
+            foreach (var stream in tpm.Operators) 
             {
-                var s = client.GetGrain<ISource>(stream.OperatorId.First(), stream.OperatorType.FullName);
-                await s.InitSource();
-                
+                if (stream.OperatorType.GetInterfaces().Contains(typeof(ISource)))
+                {
+                    var s = client.GetGrain<ISource>(stream.OperatorGUIDs.First(), stream.OperatorType.FullName);
+                    await s.InitSource();
+                }
+                else 
+                {
+                    foreach (var g in stream.OperatorGUIDs)
+                    {
+                        var s = client.GetGrain<IOperator>(g, stream.OperatorType.FullName);
+                        await s.GetSubscribedStreams();
+                    }
+                }
             }
-            foreach (var stream in tpm.Streams)
-            {
-                var s = client.GetGrain<ISource>(stream.OperatorId.First(), stream.OperatorType.FullName);
-                await s.Start();
 
+            foreach (var stream in tpm.Operators)
+            {
+                if (stream.OperatorType.GetInterfaces().Contains(typeof(ISource)))
+                {
+                    var s = client.GetGrain<ISource>(stream.OperatorGUIDs.First(), stream.OperatorType.FullName);
+                    await s.Start();
+                }
             }
             
         }

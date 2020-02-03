@@ -45,7 +45,7 @@ namespace OSPTests
                 .AddApplicationPart(typeof(ISource).Assembly)
                 .AddApplicationPart(typeof(TestSink1).Assembly)
                 .WithReferences()
-                );
+                ).AddSimpleMessageStreamProvider("SMSProvider");
         }
     }
 
@@ -61,7 +61,8 @@ namespace OSPTests
                 .AddApplicationPart(typeof(ISource).Assembly)
                 .AddApplicationPart(typeof(TestSink1).Assembly)
                 .WithReferences()
-                );
+                ).AddSimpleMessageStreamProvider("SMSProvider")
+                .AddMemoryGrainStorage("PubSubStore");
 
         }
     }

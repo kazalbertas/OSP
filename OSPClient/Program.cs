@@ -84,7 +84,7 @@ namespace OSPClient
             a.Sink(typeof(GenericPrintSink));
 
             JobManager jmgr = new JobManager();
-            await jmgr.StartTestJobAsync(tpm, client);
+            await jmgr.StartJob(tpm, client);
             await DataDriver.Run(photoStream, tagStream, gpsStream, 1600, 0);
         }
     }

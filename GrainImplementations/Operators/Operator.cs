@@ -8,19 +8,22 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using CoreOSP.Partitioner;
+using Orleans.Streams;
 
 namespace GrainImplementations.Operators
 {
     public abstract class Operator<T> : Grain, IOperator
     {
-        protected List<Guid> NextIds = new List<Guid>();
-        protected Type NextType;
+
+        protected Guid NextStreamGuid { get; set; }
+        protected List<int> NextStreamIds = new List<int>();
 
         protected Guid JobMgrId;
         protected Type JobMgrType;
         private bool Last = false;
 
-        protected IDelegator _delegator;
+        protected IPartitioner _partitioner;
 
         public override Task OnActivateAsync()
         {
@@ -29,18 +32,17 @@ namespace GrainImplementations.Operators
             return base.OnActivateAsync();
         }
 
-        public async Task Process(object input, Metadata metadata)
+        public async Task Process((object, Metadata) packedInput, StreamSequenceToken sequenceToken)
         {
-            if ((NextIds.Count == 0 || NextType == null) && !Last) 
+            (object input, Metadata metadata) = packedInput;
+            if ((NextStreamIds.Count == 0 || NextStreamGuid == null) && !Last) 
             {
-                var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetNext(this.GetPrimaryKey(), GetType());
+                var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetOutputStreams(this.GetPrimaryKey(), GetType());
                 if (result.HasValue)
                 {
-                    NextIds = result.Value.Item1;
-                    NextType = result.Value.Item2;
-                    var op = new List<(Guid, Type)>();
-                    NextIds.ForEach(x => op.Add((x, NextType)));
-                    _delegator.SetNextOperators(op);
+                    NextStreamGuid = result.Value.Item1;
+                    NextStreamIds = result.Value.Item2;
+                    _partitioner.SetOutputStreams(NextStreamGuid,NextStreamIds);
                 }
                 else throw new ArgumentNullException("No next operator found, check topology");
                 // Need to keep null types in case of sink,
@@ -57,8 +59,21 @@ namespace GrainImplementations.Operators
         {
             JobMgrType = jobMgrType;
             JobMgrId = jobMgrId;
-            _delegator = (IDelegator) Activator.CreateInstance(delegator);
+            _partitioner = (IPartitioner) Activator.CreateInstance(delegator);
             return Task.CompletedTask;
+        }
+
+        public async Task GetSubscribedStreams() 
+        {
+            var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetStreamsSubscribe(this.GetPrimaryKey(), GetType());
+            (Guid guid, List<int> id) = result.Value;
+            var provider = GetStreamProvider("SMSProvider");
+
+            foreach (var r in id) 
+            {
+                var s = provider.GetStream<(object, Metadata)>(guid, r.ToString());
+                await s.SubscribeAsync(Process);
+            }
         }
 
         public Metadata GetMetadata()
@@ -74,18 +89,26 @@ namespace GrainImplementations.Operators
 
         public virtual void ProcessWatermark(Watermark wm) 
         {
-            foreach (var i in NextIds)
-            {
-                GrainFactory.GetGrain<IOperator>(i, NextType.FullName).Process(wm, GetMetadata());
-            }
+           // foreach (var i in NextIds)
+           // {
+                //GrainFactory.GetGrain<IOperator>(i, NextType.FullName).Process(wm, GetMetadata());
+            //}
         }
 
         public virtual void ProcessCheckpoint(Checkpoint cp) 
         {
-            foreach (var i in NextIds) 
-            {
-                GrainFactory.GetGrain<IOperator>(i, NextType.FullName).Process(cp, GetMetadata());
-            }
+            //foreach (var i in NextIds) 
+           // {
+                //GrainFactory.GetGrain<IOperator>(i, NextType.FullName).Process(cp, GetMetadata());
+            //}
+        }
+
+        public async Task SendToNextStreamAsync(object key, object obj, Metadata md) 
+        {
+            var next = _partitioner.GetNextStream(key);
+            var streamProvider = GetStreamProvider("SMSProvider");
+            var stream = streamProvider.GetStream<(object,Metadata)>(next.Item1, next.Item2.ToString());
+            await stream.OnNextAsync((obj, md));
         }
 
         
