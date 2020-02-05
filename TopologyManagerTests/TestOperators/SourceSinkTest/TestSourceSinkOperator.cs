@@ -5,6 +5,7 @@ using OSPTopologyManager;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using Xunit;
 
 namespace OSPTests.TestOperators.SourceSinkTest
@@ -41,6 +42,9 @@ namespace OSPTests.TestOperators.SourceSinkTest
         [Fact]
         public async System.Threading.Tasks.Task TestSourceSinkRunAsync() 
         {
+            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(0);
+            await breaker.Reset();
+
             var conf = new TopologyConfiguration();
             conf.Delegator = typeof(RoundRobinDelegator);
             var mgr = new TopologyManager(conf);
@@ -49,6 +53,9 @@ namespace OSPTests.TestOperators.SourceSinkTest
             ds.Sink(typeof(TestSink1));
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
+            
+            var result = await breaker.GetBreaking();
+            Assert.False(result);
         }
     }
 }

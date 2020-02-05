@@ -13,12 +13,18 @@ namespace OSPTests.TestOperators.SourceSinkTest
         {
             if (index == 0)
             {
-                Assert.Equal("Test1", input);
+                if (!"Test1".Equals(input)) 
+                {
+                    GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+                }
                 index++;
             }
             else 
             {
-                Assert.Equal("Test2", input);
+                if (!"Test2".Equals(input))
+                {
+                    GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+                }
             }
         }
     }

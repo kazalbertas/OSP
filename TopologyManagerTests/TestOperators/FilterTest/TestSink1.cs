@@ -10,7 +10,10 @@ namespace OSPTests.TestOperators.FilterTest
     {
         public override void Consume(string input)
         {
-            Assert.True(input == "Test1");
+            if (!input.Equals("Test1")) 
+            {
+                GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+            }
         }
     }
 }

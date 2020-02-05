@@ -24,8 +24,4 @@
     <ProjectReference Include="..\UserGrainImplementations\UserGrainImplementations.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="TestOperators\TestParalelism\" />
-  </ItemGroup>
-
 </Project>

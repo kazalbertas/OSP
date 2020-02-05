@@ -13,12 +13,19 @@ namespace OSPTests.TestOperators.MapTest
         {
             if (index == 0)
             {
-                Assert.Equal("0", input.Field2);
+                if (!input.Field2.Equals("0")) 
+                {
+                    GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+                }
+                
                 index++;
             }
             else 
             {
-                Assert.Equal("1", input.Field2);
+                if (!input.Field2.Equals("1"))
+                {
+                    GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+                }
             }
         }
     }

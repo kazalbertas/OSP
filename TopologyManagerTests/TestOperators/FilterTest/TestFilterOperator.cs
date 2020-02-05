@@ -52,6 +52,9 @@ namespace OSPTests.TestOperators.FilterTest
         [Fact]
         public async System.Threading.Tasks.Task TestSourceFilterSinkRunAsync()
         {
+            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(0);
+            await breaker.Reset();
+
             var conf = new TopologyConfiguration();
             conf.Delegator = typeof(RoundRobinDelegator);
             var mgr = new TopologyManager(conf);
@@ -60,6 +63,9 @@ namespace OSPTests.TestOperators.FilterTest
 
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
+
+            var result = await breaker.GetBreaking();
+            Assert.False(result);
         }
     }
 }
