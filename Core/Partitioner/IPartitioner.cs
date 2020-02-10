@@ -9,8 +9,16 @@ namespace CoreOSP.Partitioner
     {
         void SetOutputStreams(Guid streamGuid, List<int> streamIDs);
 
-        (Guid,int) GetNextStream(object key);
+        (Guid, int) GetNextStream(object key);
     }
+    
+    //public abstract class BasePartitioner : IPartitioner
+    //{
+    //    public abstract (Guid, int) GetNextStream(object key);
+    //    public abstract void SetOutputStreams(Guid streamGuid, List<int> streamIDs);
+
+    //    public 
+    //}
 
     public class RoundRobinPartitioner : IPartitioner
     {
@@ -41,14 +49,18 @@ namespace CoreOSP.Partitioner
 
     public class KeyPartitioner : IPartitioner
     {
+        private Guid _streamGuid;
+        private List<int> _streamIDs;
+
         public (Guid, int) GetNextStream(object key)
         {
-            throw new NotImplementedException();
+            return (_streamGuid, key.ToString().GetHashCode() % _streamIDs.Count);
         }
 
         public void SetOutputStreams(Guid streamGuid, List<int> streamIDs)
         {
-            throw new NotImplementedException();
+            _streamGuid = streamGuid;
+            _streamIDs = streamIDs;
         }
     }
 

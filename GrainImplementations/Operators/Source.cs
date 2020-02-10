@@ -1,4 +1,5 @@
-﻿using CoreOSP.Models;
+﻿using CoreOSP;
+using CoreOSP.Models;
 using GrainInterfaces.Operators;
 using Orleans;
 using OSPJobManager;
@@ -31,8 +32,13 @@ namespace GrainImplementations.Operators
         public abstract T ProcessMessage(string message);
         public abstract object GetKey(T input);
 
-        public async Task InitSource()
+        public DateTime PreviousTime;
+        public DateTime LastIssueTime { get; set; } = DateTime.MinValue;
+        protected TimePolicy Policy { get; set; }
+
+        public async Task InitSource(TimePolicy policy)
         {
+            Policy = policy;
             if ((NextStreamIds.Count == 0 || NextStreamGuid == null))
             {
                 var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetOutputStreams(this.GetPrimaryKey(), GetType());
@@ -45,6 +51,37 @@ namespace GrainImplementations.Operators
                 else throw new ArgumentNullException("No next operator found, check topology");
                 // Need to keep null types in case of sink,
             }
+        }
+
+        public void SendMessageToStream(Data<T> dt)
+        {
+            SendToNextStreamData(dt.Key, dt, GetMetadata());
+
+            if (DateTime.Now.Subtract(LastIssueTime) > WatermarkIssuePeriod()) 
+            {
+                switch (Policy)
+                {
+                    case TimePolicy.EventTime:
+                        SendToNextStreamWatermark(GenerateWatermark(dt.Value),GetMetadata());
+                        break;
+                    case TimePolicy.ProcessingTime:
+                        SendToNextStreamWatermark(new Watermark(DateTime.Now), GetMetadata());
+                        break;
+                    default:
+                        break;
+                }
+
+                LastIssueTime = DateTime.Now;
+            }
+        }
+
+        public abstract DateTime ExtractTimestamp(T data);
+        public abstract TimeSpan MaxOutOfOrder();
+        public abstract TimeSpan WatermarkIssuePeriod();
+
+        public virtual Watermark GenerateWatermark(T input) 
+        {
+            return new Watermark(ExtractTimestamp(input).Subtract(MaxOutOfOrder()));
         }
     }
 }

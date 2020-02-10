@@ -1,0 +1,47 @@
+﻿using CoreOSP.Models;
+using GrainImplementations.Operators;
+using Orleans.Runtime;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Xunit;
+
+namespace OSPTests.TestWatermarks
+{
+    
+    public class TestSink1 : Sink<string>
+    {
+        public int wmCount = 0;
+        public bool error = false;
+        public override void ProcessWatermark(Watermark wm)
+        {
+            if (wmCount == 0)
+            {
+                if (wm.TimeStamp != new DateTime(2019, 10, 10, 10, 10, 9)) error = true;
+            }
+            else if (wmCount == 1)
+            {
+                if (wm.TimeStamp != new DateTime(2019, 10, 10, 10, 10, 9, 100)) error = true;
+            }
+            else if (wmCount == 2)
+            {
+                if (wm.TimeStamp != new DateTime(2019, 10, 10, 10, 10, 10, 500)) error = true;
+            }
+
+                wmCount++;
+            if (wmCount != 3)
+            {
+                GrainFactory.GetGrain<ITestHelper>(1).ShouldBreak();
+            }
+            else 
+            {
+                if (!error) GrainFactory.GetGrain<ITestHelper>(1).Reset();
+            }
+        }
+
+        public override void Consume(string input)
+        {
+
+        }
+    }
+}

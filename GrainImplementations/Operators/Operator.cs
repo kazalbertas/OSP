@@ -107,12 +107,22 @@ namespace GrainImplementations.Operators
             //}
         }
 
-        public async Task SendToNextStreamAsync(object key, object obj, Metadata md) 
+        public async Task SendToNextStreamData(object key, object obj, Metadata md) 
         {
             var next = _partitioner.GetNextStream(key);
             var streamProvider = GetStreamProvider("SMSProvider");
             var stream = streamProvider.GetStream<(object,Metadata)>(next.Item1, next.Item2.ToString());
             await stream.OnNextAsync((obj, md));
+        }
+
+        public async Task SendToNextStreamWatermark(Watermark wm, Metadata md) 
+        {
+            var streamProvider = GetStreamProvider("SMSProvider");
+            foreach (var id in NextStreamIds) 
+            {
+                var stream = streamProvider.GetStream<(object, Metadata)>(NextStreamGuid, id.ToString());
+                await stream.OnNextAsync((wm, md));
+            }
         }
 
         

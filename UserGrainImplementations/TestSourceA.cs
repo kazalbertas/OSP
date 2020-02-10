@@ -7,6 +7,11 @@ namespace UserGrainImplementations
 {
     public class TestSourceA : SourceSMSProvider<string>
     {
+        public override DateTime ExtractTimestamp(string data)
+        {
+            throw new NotImplementedException();
+        }
+
         public override object GetKey(string input)
         {
             return "abc";
@@ -22,9 +27,19 @@ namespace UserGrainImplementations
             return "Tag";
         }
 
+        public override TimeSpan MaxOutOfOrder()
+        {
+            throw new NotImplementedException();
+        }
+
         public override string ProcessMessage(string message)
         {
             return message;
+        }
+
+        public override TimeSpan WatermarkIssuePeriod()
+        {
+            throw new NotImplementedException();
         }
     }
 }

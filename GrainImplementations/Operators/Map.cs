@@ -13,10 +13,8 @@ namespace GrainImplementations.Operators
         public override void ProcessData(Data<T> input, Metadata metadata)
         {
             var result = ApplyMap(input.Value);
-            (var _nextOperatorId, var _nextOperatorClass) = _partitioner.GetNextStream(input.Key);
             var dt = new Data<K>(GetKey(result), result);
-            //GrainFactory.GetGrain<IOperator>(_nextOperatorId, _nextOperatorClass.FullName).Process(dt, GetMetadata());
-            SendToNextStreamAsync(dt.Key, dt, GetMetadata());
+            SendToNextStreamData(dt.Key, dt, GetMetadata());
         }
 
         public abstract K ApplyMap(T input);

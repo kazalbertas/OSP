@@ -9,7 +9,17 @@ namespace UserGrainImplementations
 {
     public class TestSource : Source<int>
     {
+        public override DateTime ExtractTimestamp(int data)
+        {
+            throw new NotImplementedException();
+        }
+
         public override object GetKey(int input)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override TimeSpan MaxOutOfOrder()
         {
             throw new NotImplementedException();
         }
@@ -20,6 +30,11 @@ namespace UserGrainImplementations
         }
 
         public override Task Start()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override TimeSpan WatermarkIssuePeriod()
         {
             throw new NotImplementedException();
         }

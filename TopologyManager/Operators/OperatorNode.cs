@@ -82,10 +82,10 @@ namespace TopologyManagerOSP.Operators
 
         //}
 
-        public void Sink(Type t, int parallelism = 1, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
+        public OperatorNode Sink(Type t, int parallelism = 1, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
         {
             if (!DataStreamValidator.ValidateType<ISink>(t)) new OperatorMismatchException("Operator is not of type ISink");
-            new OperatorNode(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
+            return new OperatorNode(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
         }
 
         public OperatorNode Filter(Type t, int parallelism = 1, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
@@ -93,6 +93,11 @@ namespace TopologyManagerOSP.Operators
             if (!DataStreamValidator.ValidateType<IFilter>(t)) new OperatorMismatchException("Operator is not of type IFilter");
 
             return new OperatorNode(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
+        }
+
+        public void AddInput(OperatorNode node) 
+        {
+            Prev.Add(node);
         }
 
         private void SetPartitioner(PartitionPolicy partitionPolicy)

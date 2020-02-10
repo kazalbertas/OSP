@@ -16,7 +16,7 @@ namespace OSPJobManager
                 if (stream.OperatorType.GetInterfaces().Contains(typeof(ISource)))
                 {
                     var s = client.GetGrain<ISource>(stream.OperatorGUIDs.First(), stream.OperatorType.FullName);
-                    await s.InitSource();
+                    await s.InitSource(tpm.Conf.TimeCharacteristic);
                 }
                 else 
                 {

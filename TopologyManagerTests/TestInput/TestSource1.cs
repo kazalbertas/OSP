@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OSPTests.TestParallelism
+namespace OSPTests.TestInput
 {
-    public class TestSource : Source<string>
+    public class TestSource1 : Source<string>
     {
         public override DateTime ExtractTimestamp(string data)
         {
@@ -31,13 +31,13 @@ namespace OSPTests.TestParallelism
 
         public override async Task Start()
         {
-            Data<string> dt = new Data<string>(GetKey("TestKey"), "Test2");
+            Data<string> dt = new Data<string>(GetKey("TestKey"), "Test1");
             SendToNextStreamData(dt.Key, dt, GetMetadata());
 
             Data<string> dt2 = new Data<string>(GetKey("TestKey"), "Test1");
             SendToNextStreamData(dt2.Key, dt2, GetMetadata());
 
-            Data<string> dt3 = new Data<string>(GetKey("TestKey"), "Test2");
+            Data<string> dt3 = new Data<string>(GetKey("TestKey"), "Test1");
             SendToNextStreamData(dt3.Key, dt3, GetMetadata());
 
             Data<string> dt4 = new Data<string>(GetKey("TestKey"), "Test1");

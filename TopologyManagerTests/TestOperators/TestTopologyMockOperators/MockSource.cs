@@ -8,7 +8,17 @@ namespace OSPTests.TestOperators.TestTopologyMockOperators
 {
     public class MockSource : Source<int>
     {
+        public override DateTime ExtractTimestamp(int data)
+        {
+            throw new NotImplementedException();
+        }
+
         public override object GetKey(int input)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override TimeSpan MaxOutOfOrder()
         {
             throw new NotImplementedException();
         }
@@ -19,6 +29,11 @@ namespace OSPTests.TestOperators.TestTopologyMockOperators
         }
 
         public override Task Start()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override TimeSpan WatermarkIssuePeriod()
         {
             throw new NotImplementedException();
         }

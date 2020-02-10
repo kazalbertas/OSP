@@ -20,10 +20,8 @@ namespace GrainImplementations.Operators
         {
             if (Apply(input.Value)) 
             {
-                var nextOp = _partitioner.GetNextStream(input.Key);
                 input.TimeStamp = DateTime.Now;
-                //GrainFactory.GetGrain<IOperator>(nextOp.Item1,nextOp.Item2.FullName).Process(input, GetMetadata());
-                SendToNextStreamAsync(input.Key, input, GetMetadata());
+                SendToNextStreamData(input.Key, input, GetMetadata());
             }
         }
 

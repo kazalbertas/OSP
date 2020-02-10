@@ -1,11 +1,6 @@
 ﻿using CoreOSP.Models;
-using GrainInterfaces.Operators;
-using Orleans;
 using Orleans.Streams;
-using OSPJobManager;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GrainImplementations.Operators
@@ -29,21 +24,13 @@ namespace GrainImplementations.Operators
                     await subscriptionHandle.ResumeAsync(OnNextMessage);
                 }
             }
-
             await stream.SubscribeAsync(OnNextMessage);
         }
 
         private async Task OnNextMessage(string message, StreamSequenceToken sequenceToken)
-        {
-            
-            T item = ProcessMessage(message);
+        {            T item = ProcessMessage(message);
             Data<T> dt = new Data<T>(GetKey(item), item);
-            //(var NextOperatorId, var NextOperatorClass) = _par.DelegateToProcess(dt.Key);
-            SendToNextStreamAsync(dt.Key, dt, GetMetadata());
-           // var grain = GrainFactory.GetGrain<IOperator>(NextOperatorId, NextOperatorClass.FullName);
-            //grain.Process(dt, GetMetadata());
-            // need to add watermarks
-            //return Task.CompletedTask;
+            SendMessageToStream(dt);
         }
 
         public abstract Guid GetStreamID();

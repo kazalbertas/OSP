@@ -3,9 +3,10 @@ using GrainImplementations.Operators;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace OSPTests.TestParallelism
+namespace OSPTests.TestWatermarks
 {
     public class TestSource : Source<string>
     {
@@ -31,22 +32,24 @@ namespace OSPTests.TestParallelism
 
         public override async Task Start()
         {
-            Data<string> dt = new Data<string>(GetKey("TestKey"), "Test2");
-            SendToNextStreamData(dt.Key, dt, GetMetadata());
+            Data<string> dt = new Data<string>(GetKey("TestKey"), "Test1");
+            SendMessageToStream(dt);
 
             Data<string> dt2 = new Data<string>(GetKey("TestKey"), "Test1");
-            SendToNextStreamData(dt2.Key, dt2, GetMetadata());
+            SendMessageToStream(dt2);
 
-            Data<string> dt3 = new Data<string>(GetKey("TestKey"), "Test2");
-            SendToNextStreamData(dt3.Key, dt3, GetMetadata());
+            Thread.Sleep(5000);
+
+            Data<string> dt3 = new Data<string>(GetKey("TestKey"), "Test1");
+            SendMessageToStream(dt3);
 
             Data<string> dt4 = new Data<string>(GetKey("TestKey"), "Test1");
-            SendToNextStreamData(dt4.Key, dt4, GetMetadata());
+            SendMessageToStream(dt4);
         }
 
         public override TimeSpan WatermarkIssuePeriod()
         {
-            throw new NotImplementedException();
+            return new TimeSpan(0,0,5);
         }
     }
 }

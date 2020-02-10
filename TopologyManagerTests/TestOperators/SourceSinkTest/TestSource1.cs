@@ -14,12 +14,20 @@ namespace OSPTests.TestOperators.SourceSinkTest
 {
     public class TestSource1 : Source<string>
     {
+        public override DateTime ExtractTimestamp(string data)
+        {
+            throw new NotImplementedException();
+        }
+
         public override object GetKey(string input)
         {
             return input;
         }
 
-
+        public override TimeSpan MaxOutOfOrder()
+        {
+            throw new NotImplementedException();
+        }
 
         public override string ProcessMessage(string message)
         {
@@ -31,12 +39,17 @@ namespace OSPTests.TestOperators.SourceSinkTest
             Data<string> dt = new Data<string>(GetKey("TestKey"), "Test1");
             //(var NextOperatorId, var NextOperatorClass) = _partitioner.GetNextStream(dt.Key);
             //var grain = GrainFactory.GetGrain<IOperator>(NextOperatorId, NextOperatorClass.FullName);
-            SendToNextStreamAsync(dt.Key, dt, GetMetadata());
+            SendToNextStreamData(dt.Key, dt, GetMetadata());
             //await grain.Process(dt, GetMetadata());
             Data<string> dt2 = new Data<string>(GetKey("TestKey"), "Test2");
             //await grain.Process(dt2, GetMetadata());
-            SendToNextStreamAsync(dt2.Key, dt2, GetMetadata());
+            SendToNextStreamData(dt2.Key, dt2, GetMetadata());
             //return Task.CompletedTask;
+        }
+
+        public override TimeSpan WatermarkIssuePeriod()
+        {
+            throw new NotImplementedException();
         }
     }
 }

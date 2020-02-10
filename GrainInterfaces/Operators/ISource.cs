@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CoreOSP;
 using System.Threading.Tasks;
 
 namespace GrainInterfaces.Operators
@@ -9,6 +7,6 @@ namespace GrainInterfaces.Operators
     {
         public Task Start();
 
-        public Task InitSource();
+        public Task InitSource(TimePolicy policy);
     }
 }
