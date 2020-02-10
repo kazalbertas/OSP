@@ -8,9 +8,11 @@ using System.Text;
 
 namespace TopologyManagerOSP.Operators
 {
-    public class DataStream
+    //rename to OperatorNode
+    public class OperatorNode
     {
-        public DataStream Prev { get; private set; }
+        // make a list
+        public List<OperatorNode> Prev { get; private set; } = new List<OperatorNode>();
 
         public List<Guid> OperatorGUIDs { get; set; } = new List<Guid>();
         public Type OperatorType { get; set; }
@@ -29,7 +31,7 @@ namespace TopologyManagerOSP.Operators
         /// </summary>
         /// <param name="t"></param>
         /// <param name="mgr">Topology manager reference for saving new operators</param>
-        internal DataStream(TopologyManager mgr, Type t, int outputStreamCount, PartitionPolicy partitionPolicy)
+        internal OperatorNode(TopologyManager mgr, Type t, int outputStreamCount, PartitionPolicy partitionPolicy)
         {
             OperatorGUIDs.Add(Guid.NewGuid());
             OperatorType = t;
@@ -40,13 +42,13 @@ namespace TopologyManagerOSP.Operators
             mgr.Operators.Add(this);
         }
 
-        internal DataStream(TopologyManager mgr, DataStream previous, Type t, int parallelism, int outputStreamCount, PartitionPolicy partitionPolicy)
+        internal OperatorNode(TopologyManager mgr, OperatorNode previous, Type t, int parallelism, int outputStreamCount, PartitionPolicy partitionPolicy)
         {
             for (int i = 0; i < parallelism; i++)
             {
                 OperatorGUIDs.Add(Guid.NewGuid());
             }
-            Prev = previous;
+            Prev.Add(previous);
             OperatorType = t;
             StreamGUID = Guid.NewGuid();
             Parallelism = parallelism;
@@ -56,18 +58,18 @@ namespace TopologyManagerOSP.Operators
             mgr.Operators.Add(this);
         }
 
-        public DataStream Map(Type t, int parallelism = 1, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
+        public OperatorNode Map(Type t, int parallelism = 1, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
         {
             if (!DataStreamValidator.ValidateType<IMap>(t)) new OperatorMismatchException("Operator is not of type IMap");
 
-            return new DataStream(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
+            return new OperatorNode(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
         }
 
-        public DataStream FlatMap(Type t, int parallelism = 1, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
+        public OperatorNode FlatMap(Type t, int parallelism = 1, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
         {
             if (!DataStreamValidator.ValidateType<IFlatMap>(t)) new OperatorMismatchException("Operator is not of type IFlatMap");
 
-            return new DataStream(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
+            return new OperatorNode(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
         }
 
         //public DataStream WindowJoin(Type t)
@@ -83,14 +85,14 @@ namespace TopologyManagerOSP.Operators
         public void Sink(Type t, int parallelism = 1, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
         {
             if (!DataStreamValidator.ValidateType<ISink>(t)) new OperatorMismatchException("Operator is not of type ISink");
-            new DataStream(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
+            new OperatorNode(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
         }
 
-        public DataStream Filter(Type t, int parallelism = 1, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
+        public OperatorNode Filter(Type t, int parallelism = 1, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
         {
             if (!DataStreamValidator.ValidateType<IFilter>(t)) new OperatorMismatchException("Operator is not of type IFilter");
 
-            return new DataStream(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
+            return new OperatorNode(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
         }
 
         private void SetPartitioner(PartitionPolicy partitionPolicy)

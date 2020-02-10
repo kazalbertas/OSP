@@ -1,5 +1,4 @@
-﻿using CoreOSP.Delegators;
-using GrainImplementations.Operators;
+﻿using GrainImplementations.Operators;
 using GrainInterfaces.Operators;
 using Microsoft.Extensions.Logging;
 using Orleans;
@@ -77,7 +76,6 @@ namespace OSPClient
             var gpsStream = streamProvider.GetStream<string>(guid, "GPS");
 
             TopologyConfiguration conf = new TopologyConfiguration();
-            conf.Delegator = typeof(RoundRobinDelegator);
             TopologyManager tpm = new TopologyManager(conf);
 
             var a = tpm.AddSource(typeof(TestSourceA));

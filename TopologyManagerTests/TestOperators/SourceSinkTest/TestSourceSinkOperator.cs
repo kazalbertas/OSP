@@ -1,5 +1,4 @@
-﻿using CoreOSP.Delegators;
-using Orleans.TestingHost;
+﻿using Orleans.TestingHost;
 using OSPJobManager;
 using OSPTopologyManager;
 using System;
@@ -46,7 +45,6 @@ namespace OSPTests.TestOperators.SourceSinkTest
             await breaker.Reset();
 
             var conf = new TopologyConfiguration();
-            conf.Delegator = typeof(RoundRobinDelegator);
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource1));
 

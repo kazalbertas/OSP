@@ -19,7 +19,6 @@ namespace OSPTests.TestParallelism
             if (val != input)
             {
                 GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
-                //throw new OrleansException("Expected: " + val + " Got: " + input);
             }
         }
     }

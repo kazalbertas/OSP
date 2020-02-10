@@ -9,7 +9,7 @@ namespace OSPTopologyManager
     public class TopologyManager
     {
 
-        public List<DataStream> Operators { get; private set; } = new List<DataStream>();
+        public List<OperatorNode> Operators { get; private set; } = new List<OperatorNode>();
 
         public TopologyConfiguration Conf { get; private set; }
 
@@ -18,9 +18,9 @@ namespace OSPTopologyManager
             Conf = conf;
         }
 
-        public DataStream AddSource(Type source, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin) 
+        public OperatorNode AddSource(Type source, int outputStreamCount = 1, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin) 
         {
-            var ds = new DataStream(this, source, outputStreamCount, partitionPolicy);
+            var ds = new OperatorNode(this, source, outputStreamCount, partitionPolicy);
             return ds;
         }
 

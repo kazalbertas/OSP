@@ -1,5 +1,4 @@
-﻿using CoreOSP.Delegators;
-using CoreOSP.Models;
+﻿using CoreOSP.Models;
 using GrainInterfaces.Operators;
 using Orleans;
 using OSPJobManager;
@@ -66,14 +65,19 @@ namespace GrainImplementations.Operators
         public async Task GetSubscribedStreams() 
         {
             var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetStreamsSubscribe(this.GetPrimaryKey(), GetType());
-            (Guid guid, List<int> id) = result.Value;
             var provider = GetStreamProvider("SMSProvider");
 
-            foreach (var r in id) 
+            foreach (var r in result) 
             {
-                var s = provider.GetStream<(object, Metadata)>(guid, r.ToString());
-                await s.SubscribeAsync(Process);
+                (Guid guid, List<int> id) = r;
+                foreach (var i in id)
+                {
+                    var s = provider.GetStream<(object, Metadata)>(guid, i.ToString());
+                    await s.SubscribeAsync(Process);
+                }
             }
+
+            
         }
 
         public Metadata GetMetadata()

@@ -10,7 +10,7 @@ namespace OSPJobManager
     public interface IJob : IGrainWithGuidKey
     {
         public Task StartJob(TopologyManager mgr);
-        public Task<(Guid, List<int>)?> GetStreamsSubscribe(Guid guid, Type type);
+        public Task<List<(Guid, List<int>)>> GetStreamsSubscribe(Guid guid, Type type);
         public Task<(Guid, List<int>)?> GetOutputStreams(Guid guid, Type type);
     }
 }

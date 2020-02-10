@@ -30,19 +30,23 @@ namespace OSPJobManager
             }
         }
 
-        public Task<(Guid,List<int>)?> GetStreamsSubscribe(Guid guid, Type type)
+        public Task<List<(Guid,List<int>)>> GetStreamsSubscribe(Guid guid, Type type)
         {
-            (Guid, List<int>)? result = null;
+            List<(Guid, List<int>)> result = new List<(Guid, List<int>)>();
             foreach (var ds in tpm.Operators) 
             {
 
                 if (ds.OperatorGUIDs.Contains(guid) && ds.OperatorType == type)
                 {
-                    var chunkSize = (int) Math.Ceiling(ds.Prev.OutputStreamCount/(double) ds.Parallelism);
-                    var index = ds.OperatorGUIDs.IndexOf(guid);
+                    foreach (var prev in ds.Prev) 
+                    {
+                        var chunkSize = (int)Math.Ceiling(prev.OutputStreamCount / (double)ds.Parallelism);
+                        var index = ds.OperatorGUIDs.IndexOf(guid);
 
-                    result = (ds.Prev.StreamGUID, Enumerable.Range(0, ds.Prev.OutputStreamCount).ToList().ChunkBy(chunkSize)[index]);
-                   
+                        result.Add((prev.StreamGUID, Enumerable.Range(0, prev.OutputStreamCount).ToList().ChunkBy(chunkSize)[index]));
+
+                        
+                    }
                     return Task.FromResult(result);
                 }
             }
