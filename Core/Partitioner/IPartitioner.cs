@@ -54,7 +54,7 @@ namespace CoreOSP.Partitioner
 
         public (Guid, int) GetNextStream(object key)
         {
-            return (_streamGuid, key.ToString().GetHashCode() % _streamIDs.Count);
+            return (_streamGuid, key.ToString().GetStableHashCode().Mod(_streamIDs.Count));
         }
 
         public void SetOutputStreams(Guid streamGuid, List<int> streamIDs)
@@ -62,6 +62,7 @@ namespace CoreOSP.Partitioner
             _streamGuid = streamGuid;
             _streamIDs = streamIDs;
         }
+
     }
 
     public class RandomPartitioner : IPartitioner
