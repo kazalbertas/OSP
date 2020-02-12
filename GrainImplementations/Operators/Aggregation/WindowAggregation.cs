@@ -1,0 +1,51 @@
+﻿using CoreOSP.Models;
+using GrainInterfaces.Operators;
+using Orleans.Streams;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using System.Linq;
+
+namespace GrainImplementations.Operators.Aggregation
+{
+    /// <summary>
+    /// Key window aggregation
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public abstract class WindowAggregation<T, K> : Operator<T>, IWindowAggregation
+    {
+        private List<Data<T>> data = new List<Data<T>>();
+
+        internal DateTime WindowStart = DateTime.MinValue;
+        internal DateTime Watermark = DateTime.MinValue;
+
+        public override void ProcessWatermark(Watermark wm, Metadata metadata)
+        {
+            Watermark = wm.TimeStamp;
+            ProcessWindow(data, Watermark);
+        }
+
+        public override void ProcessData(Data<T> input, Metadata metadata)
+        {
+            if (WindowStart == DateTime.MinValue) WindowStart = ExtractTimestamp(input);
+            if (Watermark.Subtract(AllowedLateness()) <= ExtractTimestamp(input)) data.Add(input);
+        }
+
+        internal void RemoveOutsideWindowData(DateTime newWindowStart) 
+        {
+            data = data.Where(x => ExtractTimestamp(x) >= newWindowStart).ToList();
+        }
+
+        public abstract K Aggregate(List<T> inputs);
+
+        public abstract void ProcessWindow(List<Data<T>> inputs, DateTime wm);
+
+        public virtual TimeSpan AllowedLateness()
+        {
+            return TimeSpan.Zero;
+        }
+
+        public abstract DateTime ExtractTimestamp(Data<T> input);
+    }
+}

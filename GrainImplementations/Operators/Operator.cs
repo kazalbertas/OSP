@@ -20,7 +20,7 @@ namespace GrainImplementations.Operators
 
         protected Guid JobMgrId;
         protected Type JobMgrType;
-        private bool Last = false;
+        protected bool Last = false;
 
         protected IPartitioner _partitioner;
 
@@ -31,7 +31,7 @@ namespace GrainImplementations.Operators
             return base.OnActivateAsync();
         }
 
-        public async Task Process((object, Metadata) packedInput, StreamSequenceToken sequenceToken)
+        public async virtual Task Process((object, Metadata) packedInput, StreamSequenceToken sequenceToken)
         {
             (object input, Metadata metadata) = packedInput;
             if ((NextStreamIds.Count == 0 || NextStreamGuid == null) && !Last) 
@@ -47,8 +47,8 @@ namespace GrainImplementations.Operators
                 // Need to keep null types in case of sink,
             }
 
-            if (input is Watermark) ProcessWatermark(input as Watermark);
-            else if (input is Checkpoint) ProcessCheckpoint(input as Checkpoint);
+            if (input is Watermark) ProcessWatermark(input as Watermark, metadata);
+            else if (input is Checkpoint) ProcessCheckpoint(input as Checkpoint, metadata);
             else if (input is Data<T>) ProcessData((Data<T>)input, metadata);
             else throw new ArgumentException("Argument is not of type " + typeof(T).FullName);
             //return Task.CompletedTask;
@@ -91,7 +91,7 @@ namespace GrainImplementations.Operators
 
         public abstract void ProcessData(Data<T> input, Metadata metadata);
 
-        public virtual void ProcessWatermark(Watermark wm) 
+        public virtual void ProcessWatermark(Watermark wm, Metadata metadata) 
         {
            // foreach (var i in NextIds)
            // {
@@ -99,7 +99,7 @@ namespace GrainImplementations.Operators
             //}
         }
 
-        public virtual void ProcessCheckpoint(Checkpoint cp) 
+        public virtual void ProcessCheckpoint(Checkpoint cp, Metadata metadata) 
         {
             //foreach (var i in NextIds) 
            // {

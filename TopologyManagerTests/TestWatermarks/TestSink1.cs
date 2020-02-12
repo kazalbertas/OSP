@@ -13,7 +13,7 @@ namespace OSPTests.TestWatermarks
     {
         public int wmCount = 0;
         public bool error = false;
-        public override void ProcessWatermark(Watermark wm)
+        public override void ProcessWatermark(Watermark wm, Metadata metadata)
         {
             if (wmCount == 0)
             {

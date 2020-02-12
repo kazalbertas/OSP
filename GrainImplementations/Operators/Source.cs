@@ -12,7 +12,7 @@ namespace GrainImplementations.Operators
 {
     public abstract class Source<T> : Operator<T>, ISource
     {
-        public override void ProcessCheckpoint(Checkpoint cp)
+        public override void ProcessCheckpoint(Checkpoint cp, Metadata metadata)
         {
             throw new NotImplementedException();
         }
@@ -22,7 +22,7 @@ namespace GrainImplementations.Operators
             throw new NotImplementedException();
         }
 
-        public override void ProcessWatermark(Watermark wm)
+        public override void ProcessWatermark(Watermark wm, Metadata metadata)
         {
             throw new NotImplementedException();
         }

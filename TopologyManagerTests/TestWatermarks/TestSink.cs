@@ -12,7 +12,7 @@ namespace OSPTests.TestWatermarks
     public class TestSink : Sink<string>
     {
         public int wmCount = 0;
-        public override void ProcessWatermark(Watermark wm)
+        public override void ProcessWatermark(Watermark wm, Metadata metadata)
         {
             wmCount++;
             if (wmCount != 2)

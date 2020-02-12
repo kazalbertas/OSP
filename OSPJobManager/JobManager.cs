@@ -13,6 +13,12 @@ namespace OSPJobManager
             await client.GetGrain<IJob>(Guid.NewGuid(), typeof(Job).FullName).StartJob(tpm);
             foreach (var stream in tpm.Operators) 
             {
+                if (stream.OperatorType.GetInterfaces().Contains(typeof(IWindowJoin)))
+                {
+                    var window = client.GetGrain<IWindowJoin>(stream.OperatorGUIDs.First(), stream.OperatorType.FullName);
+                    await window.SetSources(stream.Prev.SelectMany(x => x.OperatorGUIDs).ToList(), stream.SourceBPrev.SelectMany(x => x.OperatorGUIDs).ToList());
+                }
+
                 if (stream.OperatorType.GetInterfaces().Contains(typeof(ISource)))
                 {
                     var s = client.GetGrain<ISource>(stream.OperatorGUIDs.First(), stream.OperatorType.FullName);
@@ -35,8 +41,8 @@ namespace OSPJobManager
                     var s = client.GetGrain<ISource>(stream.OperatorGUIDs.First(), stream.OperatorType.FullName);
                     await s.Start();
                 }
+
             }
-            
         }
     }
 }

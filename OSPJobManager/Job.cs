@@ -42,12 +42,23 @@ namespace OSPJobManager
                     {
                         var chunkSize = (int)Math.Ceiling(prev.OutputStreamCount / (double)ds.Parallelism);
                         var index = ds.OperatorGUIDs.IndexOf(guid);
-
                         result.Add((prev.StreamGUID, Enumerable.Range(0, prev.OutputStreamCount).ToList().ChunkBy(chunkSize)[index]));
-
-                        
                     }
-                    return Task.FromResult(result);
+                }
+            }
+            if (type.GetInterfaces().Contains(typeof(IWindowJoin))) 
+            {
+                foreach (var ds in tpm.Operators)
+                {
+                    if (ds.OperatorGUIDs.Contains(guid) && ds.OperatorType == type)
+                    {
+                        foreach (var prev in ds.SourceBPrev)
+                        {
+                            var chunkSize = (int)Math.Ceiling(prev.OutputStreamCount / (double)ds.Parallelism);
+                            var index = ds.OperatorGUIDs.IndexOf(guid);
+                            result.Add((prev.StreamGUID, Enumerable.Range(0, prev.OutputStreamCount).ToList().ChunkBy(chunkSize)[index]));
+                        }
+                    }
                 }
             }
             return Task.FromResult(result);
