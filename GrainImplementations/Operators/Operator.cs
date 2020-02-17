@@ -46,8 +46,8 @@ namespace GrainImplementations.Operators
                 else throw new ArgumentNullException("No next operator found, check topology");
                 // Need to keep null types in case of sink,
             }
-
-            if (input is Watermark) ProcessWatermark(input as Watermark, metadata);
+            if (input is TerminationEvent) ProcessTerminationEvent(input as TerminationEvent);
+            else if (input is Watermark) ProcessWatermark(input as Watermark, metadata);
             else if (input is Checkpoint) ProcessCheckpoint(input as Checkpoint, metadata);
             else if (input is Data<T>) ProcessData((Data<T>)input, metadata);
             else throw new ArgumentException("Argument is not of type " + typeof(T).FullName);
@@ -76,8 +76,6 @@ namespace GrainImplementations.Operators
                     await s.SubscribeAsync(Process);
                 }
             }
-
-            
         }
 
         public Metadata GetMetadata()
@@ -105,6 +103,11 @@ namespace GrainImplementations.Operators
            // {
                 //GrainFactory.GetGrain<IOperator>(i, NextType.FullName).Process(cp, GetMetadata());
             //}
+        }
+
+        public virtual void ProcessTerminationEvent(TerminationEvent tevent) 
+        {
+            return;
         }
 
         public async Task SendToNextStreamData(object key, object obj, Metadata md) 

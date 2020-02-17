@@ -6,6 +6,7 @@ namespace CoreOSP
 {
     public enum TimePolicy 
     { 
+        None,
         EventTime,
         ProcessingTime
     }

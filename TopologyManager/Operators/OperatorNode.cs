@@ -2,6 +2,7 @@
 using CoreOSP.Partitioner;
 using GrainInterfaces.Operators;
 using OSPTopologyManager;
+using OSPTopologyManager.Operators.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +18,7 @@ namespace TopologyManagerOSP.Operators
 
         public List<Guid> OperatorGUIDs { get; set; } = new List<Guid>();
         public Type OperatorType { get; set; }
-        public object Configuration { get; private set; }
+        public ConfigurationBase Configuration { get; private set; }
 
         public int Parallelism { get; set; }
         public Guid StreamGUID { get; set; }
