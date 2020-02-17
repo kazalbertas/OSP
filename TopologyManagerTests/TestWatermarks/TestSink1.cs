@@ -21,11 +21,11 @@ namespace OSPTests.TestWatermarks
             }
             else if (wmCount == 1)
             {
-                if (wm.TimeStamp != new DateTime(2019, 10, 10, 10, 10, 9, 100)) error = true;
+                if (wm.TimeStamp != new DateTime(2019, 10, 10, 10, 10, 10, 100)) error = true;
             }
             else if (wmCount == 2)
             {
-                if (wm.TimeStamp != new DateTime(2019, 10, 10, 10, 10, 10, 500)) error = true;
+                if (wm.TimeStamp != new DateTime(2019, 10, 10, 10, 10, 11, 500)) error = true;
             }
 
                 wmCount++;
