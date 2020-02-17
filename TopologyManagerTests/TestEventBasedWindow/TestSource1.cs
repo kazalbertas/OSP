@@ -36,7 +36,8 @@ namespace OSPTests.TestEventBasedWindow
             Thread.Sleep(2000);
 
             var t5 = new TerminationEvent() { Key = "a" };
-            SendToNextStreamData(GetKey(t5), t5, GetMetadata());
+            var dt5 = new Data<TerminationEvent>(GetKey(t5), t5);
+            SendMessageToStream(dt5);
 
         }
 

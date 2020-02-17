@@ -35,7 +35,7 @@ namespace OSPTests.TestEventBasedWindow
             var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(5);
             await breaker.ShouldBreak();
             var conf = new TopologyConfiguration();
-            conf.TimeCharacteristic = CoreOSP.TimePolicy.EventTime;
+            conf.TimeCharacteristic = CoreOSP.TimePolicy.None;
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource), 1);
             var wds = ds.WindowAggregate(typeof(TestEventBasedAggregationM));

@@ -46,7 +46,7 @@ namespace GrainImplementations.Operators
                 else throw new ArgumentNullException("No next operator found, check topology");
                 // Need to keep null types in case of sink,
             }
-            if (input is TerminationEvent) ProcessTerminationEvent(input as TerminationEvent);
+            if (input is Data<TerminationEvent>) ProcessTerminationEvent(input as TerminationEvent);
             else if (input is Watermark) ProcessWatermark(input as Watermark, metadata);
             else if (input is Checkpoint) ProcessCheckpoint(input as Checkpoint, metadata);
             else if (input is Data<T>) ProcessData((Data<T>)input, metadata);
