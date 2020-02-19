@@ -17,13 +17,13 @@ namespace GrainImplementations.Operators.Aggregation
     {
         private List<Data<T>> data = new List<Data<T>>();
 
-        internal DateTime WindowStart = DateTime.MinValue;
-        internal DateTime Watermark = DateTime.MinValue;
+        public DateTime WindowStart = DateTime.MinValue;
+        public DateTime Watermark = DateTime.MinValue;
 
         public override void ProcessWatermark(Watermark wm, Metadata metadata)
         {
             Watermark = wm.TimeStamp;
-            ProcessWindow(data, Watermark);
+            if (WindowStart != DateTime.MinValue) ProcessWindow(data, Watermark);
         }
 
         public override void ProcessData(Data<T> input, Metadata metadata)

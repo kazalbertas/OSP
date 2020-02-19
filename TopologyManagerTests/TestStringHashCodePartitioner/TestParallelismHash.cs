@@ -25,7 +25,8 @@ namespace OSPTests.TestStringHashCodePartitioner
         public async System.Threading.Tasks.Task TestParallelAsync()
         {
             var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
-            await breaker.TempFailTest("Init test fail");
+            StaticTestHelper.Reset();
+            StaticTestHelper.TempFailTest("Init test fail");
             var conf = new TopologyConfiguration();
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource), 2);
@@ -33,7 +34,7 @@ namespace OSPTests.TestStringHashCodePartitioner
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
             Thread.Sleep(1000);
-            var result = await breaker.GetStatus();
+            var result = StaticTestHelper.GetStatus();
             Assert.False(result.Item1, result.Item2);
         }
 

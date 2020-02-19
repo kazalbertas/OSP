@@ -25,7 +25,7 @@ namespace OSPTests.TestInput
         public async System.Threading.Tasks.Task TestParallelAsync()
         {
             var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
-            await breaker.Reset();
+            StaticTestHelper.Reset();
             var conf = new TopologyConfiguration();
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource), 1);
@@ -35,7 +35,7 @@ namespace OSPTests.TestInput
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
             Thread.Sleep(1000);
-            var result = await breaker.GetStatus();
+            var result = StaticTestHelper.GetStatus();
             Assert.False(result.Item1,result.Item2);
         }
 

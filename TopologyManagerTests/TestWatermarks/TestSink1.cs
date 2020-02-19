@@ -31,11 +31,11 @@ namespace OSPTests.TestWatermarks
                 wmCount++;
             if (wmCount != 3)
             {
-                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).TempFailTest("Wmcount != 3, actual: " + wmCount);
+                StaticTestHelper.TempFailTest("Wmcount != 3, actual: " + wmCount);
             }
             else 
             {
-                if (!error) GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).PassTest("WmCount == 3");
+                if (!error) StaticTestHelper.PassTest("WmCount == 3");
             }
         }
 

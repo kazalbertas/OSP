@@ -13,14 +13,14 @@ namespace OSPTests.TestWindowAggregation
 
         public override void Consume(int input)
         {
-
+            StaticTestHelper.LogMessage("Logging input: " + input);
             if (input == 8 || input == 10)
             {
-                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).PassTest("Got expected value");
+                StaticTestHelper.PassTest("Got expected value");
             }
             else 
             {
-                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).FailTest("got unexpected value : " + input);
+                StaticTestHelper.FailTest("got unexpected value : " + input);
             }
         }
     }

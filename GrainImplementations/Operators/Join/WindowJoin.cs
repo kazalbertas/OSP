@@ -57,7 +57,7 @@ namespace GrainImplementations.Operators.Join
                 WatermarkB = wm.TimeStamp;
             }
 
-            ProcessWindow();
+            if (WindowStart != DateTime.MinValue) ProcessWindow();
 
         }
 

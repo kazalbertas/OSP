@@ -46,10 +46,6 @@ namespace OSPTests.TestOperators.MapTest
         [Fact]
         public async System.Threading.Tasks.Task TestMap()
         {
-            //var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
-            //await breaker.Reset();
-            //await breaker.TempFailTest("Initial fail of the test");
-
             StaticTestHelper.Reset();
             StaticTestHelper.TempFailTest("Initial fail of the test");
 
@@ -61,7 +57,6 @@ namespace OSPTests.TestOperators.MapTest
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
             Thread.Sleep(7000);
-            //var result = await breaker.GetStatus();
             var result = StaticTestHelper.GetStatus();
             Assert.False(result.Item1, result.Item2);
         }

@@ -25,8 +25,8 @@ namespace OSPTests.TestParallelism
         public async System.Threading.Tasks.Task TestParallelAsync()
         {
             var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
-            await breaker.Reset();
-            await breaker.TempFailTest("Init test fail");
+            StaticTestHelper.Reset();
+            StaticTestHelper.TempFailTest("Init test fail");
             var conf = new TopologyConfiguration();
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource), 2);
@@ -34,7 +34,7 @@ namespace OSPTests.TestParallelism
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
             Thread.Sleep(1000);
-            var result = await breaker.GetStatus();
+            var result = StaticTestHelper.GetStatus();
             Assert.False(result.Item1,result.Item2);
         }
 
@@ -42,7 +42,7 @@ namespace OSPTests.TestParallelism
         public async System.Threading.Tasks.Task TestParallelMoreStreams()
         {
             var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
-            await breaker.Reset();
+            StaticTestHelper.Reset();
             var conf = new TopologyConfiguration();
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource), 3);
@@ -50,7 +50,7 @@ namespace OSPTests.TestParallelism
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
             Thread.Sleep(1000);
-            var result = await breaker.GetStatus();
+            var result = StaticTestHelper.GetStatus();
             Assert.True(result.Item1, result.Item2);
             //must break because messages go 1,2,1,2 and there are 3 sinks 1->first 2->second 1->third 2->first = fail 
         }
@@ -59,8 +59,8 @@ namespace OSPTests.TestParallelism
         public async System.Threading.Tasks.Task TestParallelFail1Async()
         {
             var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
-            await breaker.Reset();
-            await breaker.TempFailTest("Init test fail");
+            StaticTestHelper.Reset();
+            StaticTestHelper.TempFailTest("Init test fail");
             var conf = new TopologyConfiguration();
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource1), 2);
@@ -68,7 +68,7 @@ namespace OSPTests.TestParallelism
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
             Thread.Sleep(1000);
-            var result = await breaker.GetStatus();
+            var result = StaticTestHelper.GetStatus();
             Assert.True(result.Item1, result.Item2);
         }
 
@@ -76,7 +76,7 @@ namespace OSPTests.TestParallelism
         public async System.Threading.Tasks.Task TestParallelFail2Async()
         {
             var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
-            await breaker.Reset();
+            StaticTestHelper.Reset();
             var conf = new TopologyConfiguration();
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource2), 2);
@@ -84,7 +84,7 @@ namespace OSPTests.TestParallelism
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
             Thread.Sleep(1000);
-            var result = await breaker.GetStatus();
+            var result = StaticTestHelper.GetStatus();
             Assert.True(result.Item1, result.Item2);
         }
     }

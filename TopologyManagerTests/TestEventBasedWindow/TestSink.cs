@@ -16,17 +16,17 @@ namespace OSPTests.TestEventBasedWindow
 
             if (input == 4 || input == 5 || input == 100 ||input == 8 || input == 10 )
             {
-                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).PassTest("Correct input received: " + input);
+                StaticTestHelper.PassTest("Correct input received: " + input);
                 count++;
             }
             else 
             {
-                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).FailTest("Completely incorrect value received: " + input );
+                StaticTestHelper.FailTest("Completely incorrect value received: " + input );
             }
 
             if (count != 5) 
             {
-                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).TempFailTest("Count is not 5, actual: "+ count);
+                StaticTestHelper.TempFailTest("Count is not 5, actual: "+ count);
             }
         }
     }

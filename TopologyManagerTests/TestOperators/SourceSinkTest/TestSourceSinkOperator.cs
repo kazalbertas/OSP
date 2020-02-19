@@ -42,8 +42,8 @@ namespace OSPTests.TestOperators.SourceSinkTest
         public async System.Threading.Tasks.Task TestSourceSinkRunAsync() 
         {
             var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
-            await breaker.Reset();
-            await breaker.TempFailTest("Initial test fail");
+            StaticTestHelper.Reset();
+            StaticTestHelper.TempFailTest("Initial test fail");
 
             var conf = new TopologyConfiguration();
             var mgr = new TopologyManager(conf);
@@ -54,7 +54,7 @@ namespace OSPTests.TestOperators.SourceSinkTest
             await jmgr.StartJob(mgr, _cluster.Client);
 
             Thread.Sleep(1000);
-            var result = await breaker.GetStatus();
+            var result = StaticTestHelper.GetStatus();
             Assert.False(result.Item1, result.Item2);
         }
     }

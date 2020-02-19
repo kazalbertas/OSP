@@ -19,11 +19,11 @@ namespace OSPTests.TestWindowJoin
             if ((in1.ValueForAggregation == 5 || in1.ValueForAggregation == 4) &&
                 (in2.ValueForAggregation == "5" || in2.ValueForAggregation == "4"))
             {
-                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).PassTest("Expected value received");
+                StaticTestHelper.PassTest("Expected value received");
             }
             else
             {
-                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).FailTest(string.Format("Unexpected value received in1: {0} in2: {1}", in1.ValueForAggregation, in2.ValueForAggregation));
+                StaticTestHelper.FailTest(string.Format("Unexpected value received in1: {0} in2: {1}", in1.ValueForAggregation, in2.ValueForAggregation));
             }
         }
     }
