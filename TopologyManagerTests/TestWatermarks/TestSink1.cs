@@ -9,7 +9,7 @@ using Xunit;
 namespace OSPTests.TestWatermarks
 {
     
-    public class TestSink1 : Sink<string>
+    public class TestSink1 : Sink<TestObject>
     {
         public int wmCount = 0;
         public bool error = false;
@@ -39,7 +39,8 @@ namespace OSPTests.TestWatermarks
             }
         }
 
-        public override void Consume(string input)
+
+        public override void Consume(TestObject input)
         {
 
         }
