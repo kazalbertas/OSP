@@ -10,19 +10,17 @@ namespace OSPTests.TestWindowAggregation
     
     public class TestSink : Sink<int>
     {
-        bool failed = false;
 
         public override void Consume(int input)
         {
 
-            if (input == 8 || input == 10 && !failed)
+            if (input == 8 || input == 10)
             {
-                GrainFactory.GetGrain<ITestHelper>(5).Reset();
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).PassTest("Got expected value");
             }
             else 
             {
-                failed = true;
-                GrainFactory.GetGrain<ITestHelper>(5).ShouldBreak();
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).FailTest("got unexpected value : " + input);
             }
         }
     }

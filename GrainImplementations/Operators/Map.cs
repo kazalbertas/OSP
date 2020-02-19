@@ -14,6 +14,7 @@ namespace GrainImplementations.Operators
         {
             var result = ApplyMap(input.Value);
             var dt = new Data<K>(GetKey(result), result);
+
             SendToNextStreamData(dt.Key, dt, GetMetadata());
         }
 

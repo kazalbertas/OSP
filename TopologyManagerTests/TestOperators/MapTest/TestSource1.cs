@@ -26,7 +26,7 @@ namespace OSPTests.TestOperators.MapTest
 
         public override TimeSpan MaxOutOfOrder()
         {
-            throw new NotImplementedException();
+            return new TimeSpan(0, 0, 1);
         }
 
         public override TypeA ProcessMessage(string message)
@@ -44,8 +44,10 @@ namespace OSPTests.TestOperators.MapTest
 
             var dt = new Data<TypeA>(GetKey(a1), a1);
             var dt2 = new Data<TypeA>(GetKey(a2), a2);
-            SendToNextStreamData(dt.Key, dt, GetMetadata());
-            SendToNextStreamData(dt2.Key, dt2, GetMetadata());
+            SendMessageToStream(dt);
+            SendMessageToStream(dt2);
+            //SendToNextStreamData(dt.Key, dt, GetMetadata());
+            //SendToNextStreamData(dt2.Key, dt2, GetMetadata());
             //(var NextOperatorId, var NextOperatorClass) = _delegator.DelegateToProcess(dt.Key);
             //var grain = GrainFactory.GetGrain<IOperator>(NextOperatorId, NextOperatorClass.FullName);
             //await grain.Process(dt, GetMetadata());
@@ -55,7 +57,7 @@ namespace OSPTests.TestOperators.MapTest
 
         public override TimeSpan WatermarkIssuePeriod()
         {
-            throw new NotImplementedException();
+            return new TimeSpan(0, 0, 1);
         }
     }
 }

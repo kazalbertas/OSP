@@ -18,7 +18,11 @@ namespace OSPTests.TestParallelism
 
             if (val != input)
             {
-                GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).FailTest("Unexpected value received");
+            }
+            else
+            {
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).PassTest("Value received");
             }
         }
     }

@@ -46,7 +46,7 @@ namespace GrainImplementations.Operators
                 else throw new ArgumentNullException("No next operator found, check topology");
                 // Need to keep null types in case of sink,
             }
-            if (input is Data<TerminationEvent>) ProcessTerminationEvent(input as TerminationEvent);
+            if (input is Data<TerminationEvent>) ProcessTerminationEvent(input as Data<TerminationEvent>);
             else if (input is Watermark) ProcessWatermark(input as Watermark, metadata);
             else if (input is Checkpoint) ProcessCheckpoint(input as Checkpoint, metadata);
             else if (input is Data<T>) ProcessData((Data<T>)input, metadata);
@@ -105,12 +105,12 @@ namespace GrainImplementations.Operators
             //}
         }
 
-        public virtual void ProcessTerminationEvent(TerminationEvent tevent) 
+        public virtual void ProcessTerminationEvent(Data<TerminationEvent> tevent) 
         {
             return;
         }
 
-        public async Task SendToNextStreamData(object key, object obj, Metadata md) 
+        public async void SendToNextStreamData(object key, object obj, Metadata md) 
         {
             var next = _partitioner.GetNextStream(key);
             var streamProvider = GetStreamProvider("SMSProvider");

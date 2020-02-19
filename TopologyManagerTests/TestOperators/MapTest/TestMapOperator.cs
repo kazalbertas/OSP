@@ -2,6 +2,7 @@
 using OSPJobManager;
 using OSPTopologyManager;
 using System;
+using System.Threading;
 using Xunit;
 
 namespace OSPTests.TestOperators.MapTest
@@ -45,9 +46,12 @@ namespace OSPTests.TestOperators.MapTest
         [Fact]
         public async System.Threading.Tasks.Task TestMap()
         {
+            //var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
+            //await breaker.Reset();
+            //await breaker.TempFailTest("Initial fail of the test");
 
-            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(0);
-            await breaker.Reset();
+            StaticTestHelper.Reset();
+            StaticTestHelper.TempFailTest("Initial fail of the test");
 
             var conf = new TopologyConfiguration();
             var mgr = new TopologyManager(conf);
@@ -56,9 +60,10 @@ namespace OSPTests.TestOperators.MapTest
 
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
-
-            var result = await breaker.GetBreaking();
-            Assert.False(result);
+            Thread.Sleep(7000);
+            //var result = await breaker.GetStatus();
+            var result = StaticTestHelper.GetStatus();
+            Assert.False(result.Item1, result.Item2);
         }
     }
 }

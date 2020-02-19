@@ -12,7 +12,10 @@ namespace OSPTests.TestOperators.FilterTest
         {
             if (!input.Equals("Test1")) 
             {
-                GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).FailTest("Wrong input received: " + input);
+            } else 
+            {
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).PassTest("Correct input received");
             }
         }
     }

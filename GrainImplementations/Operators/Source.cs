@@ -55,10 +55,7 @@ namespace GrainImplementations.Operators
 
         public void SendMessageToStream(Data<T> dt)
         {
-
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             SendToNextStreamData(dt.Key, dt, GetMetadata());
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
             switch (Policy)
             {
@@ -66,11 +63,7 @@ namespace GrainImplementations.Operators
 
                     if (ExtractTimestamp(dt.Value).Subtract(LastIssueTime) > WatermarkIssuePeriod())
                     {
-
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                         SendToNextStreamWatermark(GenerateWatermark(dt.Value), GetMetadata());
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                        
                         LastIssueTime = ExtractTimestamp(dt.Value);
                     }
                     break;
@@ -78,11 +71,7 @@ namespace GrainImplementations.Operators
                 case TimePolicy.ProcessingTime:
                     if (dt.TimeStamp.Subtract(LastIssueTime) > WatermarkIssuePeriod())
                     {
-
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                         SendToNextStreamWatermark(new Watermark(DateTime.Now), GetMetadata());
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                       
                         LastIssueTime = dt.TimeStamp;
                     }
                     break;

@@ -18,19 +18,23 @@ namespace OSPTests.TestInput
 
         public override void Consume(string input)
         {
-            if (!success) GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
-            
-            if (input == "Test1") 
+            if (!success) GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).TempFailTest("Not yet received from both inputs");
+
+            if (input == "Test1")
             {
                 gotTest1 = true;
             }
-            if (input == "Test2") 
+            else if (input == "Test2")
             {
                 gotTest2 = true;
             }
+            else
+            {
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).FailTest("Unexpected input: " + input);
+            }
 
             if (gotTest2 && gotTest1) success = true;
-            if (success) GrainFactory.GetGrain<ITestHelper>(0).Reset();
+            if (success) GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).PassTest("Received from both inputs already");
         }
     }
 }

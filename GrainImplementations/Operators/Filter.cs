@@ -21,6 +21,7 @@ namespace GrainImplementations.Operators
             if (Apply(input.Value)) 
             {
                 input.TimeStamp = DateTime.Now;
+
                 SendToNextStreamData(input.Key, input, GetMetadata());
             }
         }

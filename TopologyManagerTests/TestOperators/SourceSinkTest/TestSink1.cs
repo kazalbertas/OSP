@@ -11,19 +11,30 @@ namespace OSPTests.TestOperators.SourceSinkTest
         int index = 0;
         public override void Consume(string input)
         {
+            var testHelper = GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
+
             if (index == 0)
             {
-                if (!"Test1".Equals(input)) 
+                if (!"Test1".Equals(input))
                 {
-                    GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+                    testHelper.FailTest("Wrong input received, expected Test1 | got: " + input).RunSynchronously();
+                }
+                else 
+                {
+                    testHelper.PassTest("Correct value received").RunSynchronously();
                 }
                 index++;
             }
             else 
             {
+                testHelper.TempFailTest("Temp fail for index 2 ").RunSynchronously();
                 if (!"Test2".Equals(input))
                 {
-                    GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+                    testHelper.FailTest("Wrong input received, expected Test2 | got: " + input).RunSynchronously();
+                }
+                else
+                {
+                    testHelper.PassTest("Correct value received").RunSynchronously();
                 }
             }
         }

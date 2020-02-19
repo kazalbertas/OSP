@@ -24,8 +24,8 @@ namespace OSPTests.TestWindowJoin
         [Fact]
         public async System.Threading.Tasks.Task TestParallelAsync()
         {
-            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(0);
-            await breaker.ShouldBreak();
+            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
+            await breaker.TempFailTest("Initial test failure");
             var conf = new TopologyConfiguration();
             conf.TimeCharacteristic = CoreOSP.TimePolicy.EventTime;
             var mgr = new TopologyManager(conf);
@@ -38,8 +38,8 @@ namespace OSPTests.TestWindowJoin
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
             Thread.Sleep(5000);
-            var result = await breaker.GetBreaking();
-            Assert.False(result);
+            var result = await breaker.GetStatus();
+            Assert.False(result.Item1, result.Item2);
         }
 
     }

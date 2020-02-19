@@ -24,8 +24,9 @@ namespace OSPTests.TestWatermarks
         [Fact]
         public async System.Threading.Tasks.Task TestWatermark()
         {
-            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(0);
+            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
             await breaker.Reset();
+            await breaker.TempFailTest("Init test fail");
             var conf = new TopologyConfiguration();
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource), 1);
@@ -33,15 +34,16 @@ namespace OSPTests.TestWatermarks
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
             Thread.Sleep(7000);
-            var result = await breaker.GetBreaking();
-            Assert.False(result);
+            var result = await breaker.GetStatus();
+            Assert.False(result.Item1, result.Item2);
         }
 
         [Fact]
         public async System.Threading.Tasks.Task TestWatermarkEvent()
         {
-            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(1);
+            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
             await breaker.Reset();
+            await breaker.TempFailTest("Init test fail");
             var conf = new TopologyConfiguration();
             conf.TimeCharacteristic = CoreOSP.TimePolicy.EventTime;
             var mgr = new TopologyManager(conf);
@@ -50,8 +52,8 @@ namespace OSPTests.TestWatermarks
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
             Thread.Sleep(7000);
-            var result = await breaker.GetBreaking();
-            Assert.False(result);
+            var result = await breaker.GetStatus();
+            Assert.False(result.Item1, result.Item2);
         }
 
     }

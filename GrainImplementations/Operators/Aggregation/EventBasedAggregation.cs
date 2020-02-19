@@ -22,17 +22,13 @@ namespace GrainImplementations.Operators.Aggregation
             var result = AggregateResults(filteredData.Select(x=>x.Value).ToList());
             if (Filter(result)) 
             {
-
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 SendToNextStreamData(input.Key, new Data<K>(input.Key, result), GetMetadata());
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-
             }
         }
 
-        public override void ProcessTerminationEvent(TerminationEvent tevent)
+        public override void ProcessTerminationEvent(Data<TerminationEvent> tevent)
         {
-            data.RemoveAll(x => x.Key.Equals(tevent.Key));
+            data.RemoveAll(x => x.Key.Equals(tevent.Value.Key));
             // check direct injection or pass.
         }
 

@@ -17,11 +17,7 @@ namespace GrainImplementations.Operators.Aggregation
                 foreach (var group in groups)
                 {
                     var content = group.Select(x => x.Value).ToList();
-
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                     SendToNextStreamData(group.Key, new Data<K>(group.Key,Aggregate(content)), GetMetadata());
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-
                 }
                 WindowStart = WindowStart.Add(GetSlideSize());
                 RemoveOutsideWindowData(WindowStart);

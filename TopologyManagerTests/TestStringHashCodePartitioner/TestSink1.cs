@@ -16,13 +16,13 @@ namespace OSPTests.TestStringHashCodePartitioner
         {
             if (val == "")
             {
-                GrainFactory.GetGrain<ITestHelper>(0).Reset();
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).PassTest("Got a value");
                 val = input;
             } 
 
             if (val != input)
             {
-                GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).FailTest(string.Format("Wrong value received, expected: {0}, got {1} ", val, input));
             }
         }
     }

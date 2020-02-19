@@ -17,15 +17,13 @@ namespace OSPTests.TestWindowJoin
             (var in1, var in2) = input;
 
             if ((in1.ValueForAggregation == 5 || in1.ValueForAggregation == 4) &&
-                (in2.ValueForAggregation == "5" || in2.ValueForAggregation == "4") &&
-                !failed)
+                (in2.ValueForAggregation == "5" || in2.ValueForAggregation == "4"))
             {
-                GrainFactory.GetGrain<ITestHelper>(0).Reset();
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).PassTest("Expected value received");
             }
             else
             {
-                failed = true;
-                GrainFactory.GetGrain<ITestHelper>(0).ShouldBreak();
+                GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace).FailTest(string.Format("Unexpected value received in1: {0} in2: {1}", in1.ValueForAggregation, in2.ValueForAggregation));
             }
         }
     }

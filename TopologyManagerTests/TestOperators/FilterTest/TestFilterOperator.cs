@@ -4,6 +4,7 @@ using OSPTopologyManager;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using Xunit;
 
 namespace OSPTests.TestOperators.FilterTest
@@ -51,9 +52,9 @@ namespace OSPTests.TestOperators.FilterTest
         [Fact]
         public async System.Threading.Tasks.Task TestSourceFilterSinkRunAsync()
         {
-            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(0);
+            var breaker = _cluster.GrainFactory.GetGrain<ITestHelper>(this.GetType().Namespace);
             await breaker.Reset();
-
+            await breaker.TempFailTest("Initial fail of test");
             var conf = new TopologyConfiguration();
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource1));
@@ -61,9 +62,9 @@ namespace OSPTests.TestOperators.FilterTest
 
             JobManager jmgr = new JobManager();
             await jmgr.StartJob(mgr, _cluster.Client);
-
-            var result = await breaker.GetBreaking();
-            Assert.False(result);
+            Thread.Sleep(1000);
+            var result = await breaker.GetStatus();
+            Assert.False(result.Item1, result.Item2);
         }
     }
 }
