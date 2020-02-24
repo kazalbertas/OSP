@@ -4,6 +4,7 @@ using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace OSPTests.TestWatermarks
@@ -13,7 +14,7 @@ namespace OSPTests.TestWatermarks
     {
         public int wmCount = 0;
         public bool error = false;
-        public override void ProcessWatermark(Watermark wm, Metadata metadata)
+        public override Task ProcessWatermark(Watermark wm, Metadata metadata)
         {
             if (wmCount == 0)
             {
@@ -37,6 +38,7 @@ namespace OSPTests.TestWatermarks
             {
                 if (!error) StaticTestHelper.PassTest("WmCount == 3");
             }
+            return Task.CompletedTask;
         }
 
 

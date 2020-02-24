@@ -9,7 +9,7 @@ namespace GrainImplementations.Operators.Aggregation
     public abstract class SlidingWindowAggregation<T,K> : WindowAggregation<T,K>
     {
 
-        public override void ProcessWindow(List<Data<T>> inputs, DateTime watermark)
+        public override async void ProcessWindow(List<Data<T>> inputs, DateTime watermark)
         {
             if (watermark > WindowStart.Add(GetWindowSize()))
             {
@@ -17,7 +17,7 @@ namespace GrainImplementations.Operators.Aggregation
                 foreach (var group in groups)
                 {
                     var content = group.Select(x => x.Value).ToList();
-                    SendToNextStreamData(group.Key, new Data<K>(group.Key,Aggregate(content)), GetMetadata());
+                    await SendToNextStreamData(group.Key, new Data<K>(group.Key,Aggregate(content)), GetMetadata());
                 }
                 WindowStart = WindowStart.Add(GetSlideSize());
                 RemoveOutsideWindowData(WindowStart);

@@ -57,7 +57,6 @@ namespace OSPTests.TestEventJoin
             var t6 = new Test() { KeyValue = "b", ValueForAggregation = 110, EventTime = new DateTime(2019, 10, 10, 10, 10, 19) };
             Data<Test> dt6 = new Data<Test>(GetKey(t6), t6);
             await SendMessageToStream(dt6);
-            return Task.CompletedTask;
         }
 
         public override TimeSpan WatermarkIssuePeriod()

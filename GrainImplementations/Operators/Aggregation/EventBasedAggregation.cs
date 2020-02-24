@@ -2,6 +2,7 @@
 using GrainInterfaces.Operators;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GrainImplementations.Operators.Aggregation
 {
@@ -14,7 +15,7 @@ namespace GrainImplementations.Operators.Aggregation
         //returns true if update
         public abstract bool CheckUpdateEvent(T input, T aggEvent);
 
-        public override void ProcessData(Data<T> input, Metadata metadata)
+        public override async Task ProcessData(Data<T> input, Metadata metadata)
         {
             data.RemoveAll(x => x.Key.Equals(input.Key) && CheckUpdateEvent(input.Value, x.Value));
             data.Add(input);
@@ -22,13 +23,14 @@ namespace GrainImplementations.Operators.Aggregation
             var result = AggregateResults(filteredData.Select(x=>x.Value).ToList());
             if (Filter(result)) 
             {
-                SendToNextStreamData(input.Key, new Data<K>(input.Key, result), GetMetadata());
+                await SendToNextStreamData(input.Key, new Data<K>(input.Key, result), GetMetadata());
             }
         }
 
-        public override void ProcessTerminationEvent(Data<TerminationEvent> tevent)
+        public override Task ProcessTerminationEvent(Data<TerminationEvent> tevent)
         {
             data.RemoveAll(x => x.Key.Equals(tevent.Value.Key));
+            return Task.CompletedTask;
             // check direct injection or pass.
         }
 

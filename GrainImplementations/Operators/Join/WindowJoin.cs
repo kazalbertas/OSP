@@ -38,16 +38,16 @@ namespace GrainImplementations.Operators.Join
                 // Need to keep null types in case of sink,
             }
 
-            if (input is Watermark) ProcessWatermark(input as Watermark, metadata);
-            else if (input is Checkpoint) ProcessCheckpoint(input as Checkpoint, metadata);
-            else if (input is Data<T> && SourceA.Contains(metadata.SenderId)) ProcessData((Data<T>)input, metadata);
-            else if (input is Data<K> && SourceB.Contains(metadata.SenderId)) ProcessData((Data<K>)input, metadata);
+            if (input is Watermark) await ProcessWatermark(input as Watermark, metadata);
+            else if (input is Checkpoint) await ProcessCheckpoint(input as Checkpoint, metadata);
+            else if (input is Data<T> && SourceA.Contains(metadata.SenderId)) await ProcessData((Data<T>)input, metadata);
+            else if (input is Data<K> && SourceB.Contains(metadata.SenderId)) await ProcessData((Data<K>)input, metadata);
             else throw new ArgumentException("Argument is not of type " + typeof(T).FullName);
         }
 
-        public abstract void ProcessData(Data<K> input, Metadata metadata);
+        public abstract Task ProcessData(Data<K> input, Metadata metadata);
 
-        public override void ProcessWatermark(Watermark wm, Metadata metadata)
+        public override Task ProcessWatermark(Watermark wm, Metadata metadata)
         {
             if (SourceA.Contains(metadata.SenderId)) 
             {
@@ -58,7 +58,7 @@ namespace GrainImplementations.Operators.Join
             }
 
             if (WindowStart != DateTime.MinValue) ProcessWindow();
-
+            return Task.CompletedTask;
         }
 
         internal void RemoveOutsideWindowData(DateTime newWindowStart)

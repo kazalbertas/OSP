@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace GrainImplementations.Operators.Join
 {
@@ -20,7 +21,7 @@ namespace GrainImplementations.Operators.Join
             }
         }
 
-        public override void ProcessData(Data<K> input, Metadata metadata)
+        public override async Task ProcessData(Data<K> input, Metadata metadata)
         {
             if (WindowStart == DateTime.MinValue) WindowStart = ExtractTimestamp(input);
             if (WatermarkB.Subtract(AllowedLateness()) <= ExtractTimestamp(input))
@@ -33,13 +34,13 @@ namespace GrainImplementations.Operators.Join
                     foreach (var aIn in sourceAWithSameKey)
                     {
                         var dt = new Data<(T, K)>(input.Key, (aIn.Value, input.Value));
-                        SendToNextStreamData(input.Key, dt, GetMetadata());
+                        await SendToNextStreamData(input.Key, dt, GetMetadata());
                     }
                 }
             }
         }
 
-        public override void ProcessData(Data<T> input, Metadata metadata)
+        public override async Task ProcessData(Data<T> input, Metadata metadata)
         {
             if (WindowStart == DateTime.MinValue) WindowStart = ExtractTimestamp(input);
             if (WatermarkA.Subtract(AllowedLateness()) <= ExtractTimestamp(input))
@@ -52,7 +53,7 @@ namespace GrainImplementations.Operators.Join
                     foreach (var bIn in sourceBWithSameKey)
                     {
                         var dt = new Data<(T, K)>(input.Key, (input.Value, bIn.Value));
-                        SendToNextStreamData(input.Key, dt, GetMetadata());
+                        await SendToNextStreamData(input.Key, dt, GetMetadata());
                     }
                 }
             }

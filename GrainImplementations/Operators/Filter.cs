@@ -11,22 +11,22 @@ namespace GrainImplementations.Operators
     {
         public abstract bool Apply(T input);
 
-        public override void ProcessCheckpoint(Checkpoint cp, Metadata metadata)
+        public override Task ProcessCheckpoint(Checkpoint cp, Metadata metadata)
         {
             throw new NotImplementedException();
         }
 
-        public override void ProcessData(Data<T> input, Metadata metadata)
+        public override async Task ProcessData(Data<T> input, Metadata metadata)
         {
             if (Apply(input.Value)) 
             {
                 input.TimeStamp = DateTime.Now;
 
-                SendToNextStreamData(input.Key, input, GetMetadata());
+                await SendToNextStreamData(input.Key, input, GetMetadata());
             }
         }
 
-        public override void ProcessWatermark(Watermark wm, Metadata metadata)
+        public override Task ProcessWatermark(Watermark wm, Metadata metadata)
         {
             throw new NotImplementedException();
         }

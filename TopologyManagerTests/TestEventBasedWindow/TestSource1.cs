@@ -37,7 +37,7 @@ namespace OSPTests.TestEventBasedWindow
 
             var t5 = new TerminationEvent() { Key = "a" };
             var dt5 = new Data<TerminationEvent>(GetKey(t5), t5);
-            SendMessageToStream(dt5);
+            await SendMessageToStream(dt5);
 
         }
 

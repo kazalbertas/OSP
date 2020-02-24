@@ -2,13 +2,15 @@
 using Orleans;
 using OSPTopologyManager;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace OSPJobManager
 {
     public class JobManager
     {
-        public async System.Threading.Tasks.Task StartJob(TopologyManager tpm, IClusterClient client) 
+        public async Task StartJob(TopologyManager tpm, IClusterClient client) 
         {
             await client.GetGrain<IJob>(Guid.NewGuid(), typeof(Job).FullName).StartJob(tpm);
             foreach (var stream in tpm.Operators) 
@@ -33,16 +35,17 @@ namespace OSPJobManager
                     }
                 }
             }
-
+            var tasks = new List<Task>();
             foreach (var stream in tpm.Operators)
             {
+                
                 if (stream.OperatorType.GetInterfaces().Contains(typeof(ISource)))
                 {
                     var s = client.GetGrain<ISource>(stream.OperatorGUIDs.First(), stream.OperatorType.FullName);
-                    await s.Start();
+                    tasks.Add(s.Start());
                 }
-
             }
+            await Task.WhenAll(tasks);
         }
     }
 }

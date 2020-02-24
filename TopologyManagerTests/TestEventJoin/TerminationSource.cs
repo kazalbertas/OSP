@@ -36,7 +36,7 @@ namespace OSPTests.TestEventJoin
 
             var t5 = new TerminationEvent() { Key = "a" };
             var dt5 = new Data<TerminationEvent>(GetKey(t5), t5);
-            SendMessageToStream(dt5);
+            await SendMessageToStream(dt5);
         }
 
         public override TimeSpan WatermarkIssuePeriod()

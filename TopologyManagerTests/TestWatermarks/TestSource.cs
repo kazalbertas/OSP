@@ -33,18 +33,18 @@ namespace OSPTests.TestWatermarks
         public override async Task Start()
         {
             Data<string> dt = new Data<string>(GetKey("TestKey"), "Test1");
-            SendMessageToStream(dt);
+            await SendMessageToStream(dt);
 
             Data<string> dt2 = new Data<string>(GetKey("TestKey"), "Test1");
-            SendMessageToStream(dt2);
+            await SendMessageToStream(dt2);
 
             Thread.Sleep(5000);
 
             Data<string> dt3 = new Data<string>(GetKey("TestKey"), "Test1");
-            SendMessageToStream(dt3);
+            await SendMessageToStream(dt3);
 
             Data<string> dt4 = new Data<string>(GetKey("TestKey"), "Test1");
-            SendMessageToStream(dt4);
+            await SendMessageToStream(dt4);
         }
 
         public override TimeSpan WatermarkIssuePeriod()

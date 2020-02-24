@@ -44,8 +44,8 @@ namespace OSPTests.TestOperators.MapTest
 
             var dt = new Data<TypeA>(GetKey(a1), a1);
             var dt2 = new Data<TypeA>(GetKey(a2), a2);
-            SendMessageToStream(dt);
-            SendMessageToStream(dt2);
+            await SendMessageToStream(dt);
+            await SendMessageToStream(dt2);
             //SendToNextStreamData(dt.Key, dt, GetMetadata());
             //SendToNextStreamData(dt2.Key, dt2, GetMetadata());
             //(var NextOperatorId, var NextOperatorClass) = _delegator.DelegateToProcess(dt.Key);

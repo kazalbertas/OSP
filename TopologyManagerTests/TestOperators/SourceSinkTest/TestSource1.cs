@@ -37,9 +37,9 @@ namespace OSPTests.TestOperators.SourceSinkTest
         public override async Task Start()
         {
             Data<string> dt = new Data<string>(GetKey("TestKey"), "Test1");
-            SendToNextStreamData(dt.Key, dt, GetMetadata());
+            await SendToNextStreamData(dt.Key, dt, GetMetadata());
             Data<string> dt2 = new Data<string>(GetKey("TestKey"), "Test2");
-            SendToNextStreamData(dt2.Key, dt2, GetMetadata());
+            await SendToNextStreamData(dt2.Key, dt2, GetMetadata());
         }
 
         public override TimeSpan WatermarkIssuePeriod()

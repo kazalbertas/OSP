@@ -12,17 +12,17 @@ namespace GrainImplementations.Operators
 {
     public abstract class Source<T> : Operator<T>, ISource
     {
-        public override void ProcessCheckpoint(Checkpoint cp, Metadata metadata)
+        public override Task ProcessCheckpoint(Checkpoint cp, Metadata metadata)
         {
             throw new NotImplementedException();
         }
 
-        public override void ProcessData(Data<T> data, Metadata metadata)
+        public override Task ProcessData(Data<T> data, Metadata metadata)
         {
             throw new NotImplementedException();
         }
 
-        public override void ProcessWatermark(Watermark wm, Metadata metadata)
+        public override Task ProcessWatermark(Watermark wm, Metadata metadata)
         {
             throw new NotImplementedException();
         }
@@ -53,9 +53,9 @@ namespace GrainImplementations.Operators
             }
         }
 
-        public void SendMessageToStream(Data<T> dt)
+        public async Task SendMessageToStream(Data<T> dt)
         {
-            SendToNextStreamData(dt.Key, dt, GetMetadata());
+            await SendToNextStreamData(dt.Key, dt, GetMetadata());
 
             switch (Policy)
             {
@@ -63,7 +63,7 @@ namespace GrainImplementations.Operators
 
                     if (ExtractTimestamp(dt.Value).Subtract(LastIssueTime) > WatermarkIssuePeriod())
                     {
-                        SendToNextStreamWatermark(GenerateWatermark(dt.Value), GetMetadata());
+                        await SendToNextStreamWatermark(GenerateWatermark(dt.Value), GetMetadata());
                         LastIssueTime = ExtractTimestamp(dt.Value);
                     }
                     break;
@@ -71,7 +71,7 @@ namespace GrainImplementations.Operators
                 case TimePolicy.ProcessingTime:
                     if (dt.TimeStamp.Subtract(LastIssueTime) > WatermarkIssuePeriod())
                     {
-                        SendToNextStreamWatermark(new Watermark(DateTime.Now), GetMetadata());
+                        await SendToNextStreamWatermark(new Watermark(DateTime.Now), GetMetadata());
                         LastIssueTime = dt.TimeStamp;
                     }
                     break;

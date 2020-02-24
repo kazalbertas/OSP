@@ -11,7 +11,7 @@ namespace CoreOSP.Models
         public V Value { get; set; }
         
         public static explicit operator Data<object>(Data<V> x) => new Data<object>(x.Key, x.Value) { TimeStamp = x.TimeStamp};
-
+        
         [ProcessingTime]
         public DateTime TimeStamp { get; set; }
 

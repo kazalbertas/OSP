@@ -10,8 +10,6 @@ namespace OSPTests.TestWindowJoin
     
     public class TestSink : Sink<(Test,Test2)>
     {
-        bool failed = false;
-
         public override void Consume((Test, Test2) input)
         {
             (var in1, var in2) = input;

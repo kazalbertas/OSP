@@ -18,17 +18,19 @@ namespace OSPTests.TestWindowAggregation
 
     public class SumWindowAgg : TumblingWindowAggregation<Test,int>
     {
-        public override void ProcessData(Data<Test> input, Metadata metadata)
+        public override Task ProcessData(Data<Test> input, Metadata metadata)
         {
             StaticTestHelper.LogMessage("Window start: " + this.WindowStart);
             StaticTestHelper.LogMessage("Logginge event time: " + input.Value.EventTime);
             base.ProcessData(input, metadata);
+            return Task.CompletedTask;
         }
 
-        public override void ProcessWatermark(Watermark wm, Metadata metadata)
+        public override Task ProcessWatermark(Watermark wm, Metadata metadata)
         {
             StaticTestHelper.LogMessage("Watermarktime: " + wm.TimeStamp);
             base.ProcessWatermark(wm, metadata);
+            return Task.CompletedTask;
         }
 
         public override int Aggregate(List<Test> inputs)

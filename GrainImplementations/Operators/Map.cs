@@ -10,12 +10,12 @@ namespace GrainImplementations.Operators
     public abstract class Map<T,K> : Operator<T>, IMap
     {
 
-        public override void ProcessData(Data<T> input, Metadata metadata)
+        public override async Task ProcessData(Data<T> input, Metadata metadata)
         {
             var result = ApplyMap(input.Value);
             var dt = new Data<K>(GetKey(result), result);
 
-            SendToNextStreamData(dt.Key, dt, GetMetadata());
+            await SendToNextStreamData(dt.Key, dt, GetMetadata());
         }
 
         public abstract K ApplyMap(T input);

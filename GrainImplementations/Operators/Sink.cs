@@ -12,13 +12,21 @@ namespace GrainImplementations.Operators
 
         public abstract void Consume(T input);
 
-        public override void ProcessCheckpoint(Checkpoint cp, Metadata metadata) {/*Do nothing right now. Checkpoint is sent to checkpoint manager to finalize snapshot.*/}
-
-        public override void ProcessData(Data<T> input, Metadata metadata)
+        public override Task ProcessCheckpoint(Checkpoint cp, Metadata metadata) 
         {
-            Consume(input.Value);
+            /*Do nothing right now. Checkpoint is sent to checkpoint manager to finalize snapshot.*/return Task.CompletedTask; 
         }
 
-        public override void ProcessWatermark(Watermark wm, Metadata metadata) {/*Do nothing*/}
+        public override Task ProcessData(Data<T> input, Metadata metadata)
+        {
+            Consume(input.Value);
+            return Task.CompletedTask;
+        }
+
+        public override Task ProcessWatermark(Watermark wm, Metadata metadata) 
+        {
+            /*Do nothing*/ 
+            return Task.CompletedTask; 
+        }
     }
 }

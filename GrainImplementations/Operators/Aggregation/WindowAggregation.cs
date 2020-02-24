@@ -20,16 +20,18 @@ namespace GrainImplementations.Operators.Aggregation
         public DateTime WindowStart = DateTime.MinValue;
         public DateTime Watermark = DateTime.MinValue;
 
-        public override void ProcessWatermark(Watermark wm, Metadata metadata)
+        public override Task ProcessWatermark(Watermark wm, Metadata metadata)
         {
             Watermark = wm.TimeStamp;
             if (WindowStart != DateTime.MinValue) ProcessWindow(data, Watermark);
+            return Task.CompletedTask;
         }
 
-        public override void ProcessData(Data<T> input, Metadata metadata)
+        public override Task ProcessData(Data<T> input, Metadata metadata)
         {
             if (WindowStart == DateTime.MinValue) WindowStart = ExtractTimestamp(input);
             if (Watermark.Subtract(AllowedLateness()) <= ExtractTimestamp(input)) data.Add(input);
+            return Task.CompletedTask;
         }
 
         internal void RemoveOutsideWindowData(DateTime newWindowStart) 
