@@ -36,7 +36,7 @@ namespace OSPTests.TestEventBasedWindow
             StaticTestHelper.Reset();
             StaticTestHelper.TempFailTest("Initial fail of the test");
             var conf = new TopologyConfiguration();
-            conf.TimeCharacteristic = CoreOSP.TimePolicy.None;
+            conf.TimeCharacteristic = CoreOSP.TimePolicy.EventTime;
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource), 1);
             var wds = ds.WindowAggregate(typeof(TestEventBasedAggregationM));

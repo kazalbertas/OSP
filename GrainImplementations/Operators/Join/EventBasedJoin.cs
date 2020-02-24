@@ -26,6 +26,11 @@ namespace GrainImplementations.Operators.Join
         protected List<Data<T>> sourceAInput = new List<Data<T>>();
         protected List<Data<K>> sourceBInput = new List<Data<K>>();
 
+        private List<TerminationEvent> TerminationEvent { get; } = new List<TerminationEvent>();
+
+        internal DateTime WatermarkA = DateTime.MinValue;
+        internal DateTime WatermarkB = DateTime.MinValue;
+
         public override async Task Process((object, Metadata) packedInput, StreamSequenceToken sequenceToken)
         {
             (object input, Metadata metadata) = packedInput;
@@ -47,6 +52,33 @@ namespace GrainImplementations.Operators.Join
             else if (input is Data<T> && SourceA.Contains(metadata.SenderId)) await ProcessData((Data<T>)input, metadata);
             else if (input is Data<K> && SourceB.Contains(metadata.SenderId)) await ProcessData((Data<K>)input, metadata);
             else throw new ArgumentException("Argument is not of type " + typeof(T).FullName);
+        }
+
+        public override async Task ProcessWatermark(Watermark wm, Metadata metadata)
+        {
+            if (SourceA.Contains(metadata.SenderId))
+            {
+                WatermarkA = wm.TimeStamp;
+            }
+            else if (SourceB.Contains(metadata.SenderId))
+            {
+                WatermarkB = wm.TimeStamp;
+            }
+
+            if (WatermarkA == new DateTime(2019, 10, 10, 10, 10, 13) && WatermarkB == new DateTime(2019, 10, 10, 10, 10, 13))
+            {
+                Console.WriteLine("aa");
+            }
+
+            foreach (var e in TerminationEvent.ToArray())
+            {
+                if (e.TimeStamp <= WatermarkA && e.TimeStamp <= WatermarkB)
+                {
+                    RemoveProcessed(e.Key, e.TimeStamp);
+                    TerminationEvent.Remove(e);
+                }
+            }
+            await SendToNextStreamWatermark(wm, GetMetadata());
         }
 
         public override async Task ProcessData(Data<T> input, Metadata metadata)
@@ -78,10 +110,23 @@ namespace GrainImplementations.Operators.Join
             }
         }
 
+        private void RemoveProcessed(object key, DateTime timestamp)
+        {
+            sourceAInput.RemoveAll(x => x.Key.Equals(key) && ExtractDateTime(x.Value) <= timestamp);
+            sourceBInput.RemoveAll(x => x.Key.Equals(key) && ExtractDateTime(x.Value) <= timestamp);
+        }
+
         public override Task ProcessTerminationEvent(Data<TerminationEvent> tevent)
         {
-            sourceAInput.RemoveAll(x => x.Key.Equals(tevent.Value.Key));
-            sourceBInput.RemoveAll(x => x.Key.Equals(tevent.Value.Key));
+            TerminationEvent.Add(tevent.Value);
+            foreach (var e in TerminationEvent.ToArray())
+            {
+                if (e.TimeStamp <= WatermarkA && e.TimeStamp <= WatermarkB)
+                {
+                    RemoveProcessed(e.Key, e.TimeStamp);
+                    TerminationEvent.Remove(e);
+                }
+            }
             return Task.CompletedTask;
         }
 

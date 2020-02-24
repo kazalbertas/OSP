@@ -16,7 +16,13 @@ namespace OSPTests.TestEventBasedWindow
 
         public override bool CheckUpdateEvent(Test input, Test aggEvent)
         {
-            return input.Id == aggEvent.Id;
+            //return input.Id == aggEvent.Id;
+            return false;
+        }
+
+        public override DateTime ExtractDateTime(Test item)
+        {
+            return item.EventTime;
         }
     }
 }

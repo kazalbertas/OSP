@@ -61,7 +61,7 @@ namespace GrainImplementations.Operators
             {
                 case TimePolicy.EventTime:
 
-                    if (ExtractTimestamp(dt.Value).Subtract(LastIssueTime) > WatermarkIssuePeriod())
+                    if (ExtractTimestamp(dt.Value).Subtract(LastIssueTime) >= WatermarkIssuePeriod())
                     {
                         await SendToNextStreamWatermark(GenerateWatermark(dt.Value), GetMetadata());
                         LastIssueTime = ExtractTimestamp(dt.Value);
@@ -69,7 +69,7 @@ namespace GrainImplementations.Operators
                     break;
 
                 case TimePolicy.ProcessingTime:
-                    if (dt.TimeStamp.Subtract(LastIssueTime) > WatermarkIssuePeriod())
+                    if (dt.TimeStamp.Subtract(LastIssueTime) >= WatermarkIssuePeriod())
                     {
                         await SendToNextStreamWatermark(new Watermark(DateTime.Now), GetMetadata());
                         LastIssueTime = dt.TimeStamp;

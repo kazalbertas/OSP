@@ -19,15 +19,14 @@ namespace OSPTests.TestEventJoin
             return input.EventTime;
         }
 
-        public override Task ProcessTerminationEvent(Data<TerminationEvent> tevent)
+        public override async Task ProcessTerminationEvent(Data<TerminationEvent> tevent)
         {
             StaticTestHelper.LogMessage(this.sourceAInput.Count.ToString());
             StaticTestHelper.LogMessage(this.sourceBInput.Count.ToString());
             StaticTestHelper.LogMessage(tevent.Value.Key.ToString());
-            base.ProcessTerminationEvent(tevent);
+            await base.ProcessTerminationEvent(tevent);
             StaticTestHelper.LogMessage(this.sourceAInput.Count.ToString());
             StaticTestHelper.LogMessage(this.sourceBInput.Count.ToString());
-            return Task.CompletedTask;
         }
     }
 }

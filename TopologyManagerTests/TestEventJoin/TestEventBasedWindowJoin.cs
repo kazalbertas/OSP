@@ -27,7 +27,7 @@ namespace OSPTests.TestEventJoin
             StaticTestHelper.Reset();
             StaticTestHelper.TempFailTest("Initial test failure");
             var conf = new TopologyConfiguration();
-            conf.TimeCharacteristic = CoreOSP.TimePolicy.None;
+            conf.TimeCharacteristic = CoreOSP.TimePolicy.EventTime;
             var mgr = new TopologyManager(conf);
             var ds = mgr.AddSource(typeof(TestSource1), 1);
 

@@ -12,7 +12,7 @@ namespace OSPTests.TestEventBasedWindow
     {
         public override DateTime ExtractTimestamp(TerminationEvent data)
         {
-            throw new NotImplementedException();
+            return data.TimeStamp;
         }
 
         public override object GetKey(TerminationEvent input)
@@ -22,7 +22,7 @@ namespace OSPTests.TestEventBasedWindow
 
         public override TimeSpan MaxOutOfOrder()
         {
-            throw new NotImplementedException();
+            return TimeSpan.Zero;
         }
 
         public override TerminationEvent ProcessMessage(string message)
@@ -35,7 +35,7 @@ namespace OSPTests.TestEventBasedWindow
 
             Thread.Sleep(2000);
 
-            var t5 = new TerminationEvent() { Key = "a" };
+            var t5 = new TerminationEvent() { Key = "a" , TimeStamp = new DateTime(2019, 10, 10, 10, 10, 13) };
             var dt5 = new Data<TerminationEvent>(GetKey(t5), t5);
             await SendMessageToStream(dt5);
 
