@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using CoreOSP.Partitioner;
 using Orleans.Streams;
+using CoreOSP;
 
 namespace GrainImplementations.Operators
 {
@@ -18,8 +19,7 @@ namespace GrainImplementations.Operators
         protected Guid NextStreamGuid { get; set; }
         protected List<int> NextStreamIds = new List<int>();
 
-        protected Guid JobMgrId;
-        protected Type JobMgrType;
+        protected OperatorInitConfig Oicfg { get; set; }
         protected bool Last = false;
 
         protected IPartitioner _partitioner;
@@ -36,7 +36,7 @@ namespace GrainImplementations.Operators
             (object input, Metadata metadata) = packedInput;
             if ((NextStreamIds.Count == 0 || NextStreamGuid == null) && !Last) 
             {
-                var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetOutputStreams(this.GetPrimaryKey(), GetType());
+                var result = await GrainFactory.GetGrain<IJob>(Oicfg.JobManagerGuid, Oicfg.JobManagerType.FullName).GetOutputStreams(this.GetPrimaryKey(), GetType());
                 if (result.HasValue)
                 {
                     NextStreamGuid = result.Value.Item1;
@@ -54,17 +54,16 @@ namespace GrainImplementations.Operators
             //return Task.CompletedTask;
         }
 
-        public Task Init(Guid jobMgrId, Type jobMgrType, Type delegator)
+        public Task Init(OperatorInitConfig operatorInitConfig)
         {
-            JobMgrType = jobMgrType;
-            JobMgrId = jobMgrId;
-            _partitioner = (IPartitioner) Activator.CreateInstance(delegator);
+            Oicfg = operatorInitConfig;
+            _partitioner = (IPartitioner)Activator.CreateInstance(operatorInitConfig.Partitioner);
             return Task.CompletedTask;
         }
 
         public async Task GetSubscribedStreams() 
         {
-            var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetStreamsSubscribe(this.GetPrimaryKey(), GetType());
+            var result = await GrainFactory.GetGrain<IJob>(Oicfg.JobManagerGuid, Oicfg.JobManagerType.FullName).GetStreamsSubscribe(this.GetPrimaryKey(), GetType());
             var provider = GetStreamProvider("SMSProvider");
 
             foreach (var r in result) 
@@ -129,7 +128,5 @@ namespace GrainImplementations.Operators
                 await stream.OnNextAsync((wm, md));
             }
         }
-
-        
     }
 }

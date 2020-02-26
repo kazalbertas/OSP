@@ -8,7 +8,8 @@ namespace CoreOSP
     { 
         None,
         EventTime,
-        ProcessingTime
+        ProcessingTime,
+        IngestionTime
     }
 
     [AttributeUsage(AttributeTargets.Property)]

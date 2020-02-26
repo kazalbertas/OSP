@@ -4,8 +4,6 @@ using GrainInterfaces.Operators;
 using Orleans;
 using OSPJobManager;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GrainImplementations.Operators
@@ -41,7 +39,7 @@ namespace GrainImplementations.Operators
             Policy = policy;
             if ((NextStreamIds.Count == 0 || NextStreamGuid == null))
             {
-                var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetOutputStreams(this.GetPrimaryKey(), GetType());
+                var result = await GrainFactory.GetGrain<IJob>(Oicfg.JobManagerGuid, Oicfg.JobManagerType.FullName).GetOutputStreams(this.GetPrimaryKey(), GetType());
                 if (result.HasValue)
                 {
                     NextStreamGuid = result.Value.Item1;
@@ -69,10 +67,10 @@ namespace GrainImplementations.Operators
                     break;
 
                 case TimePolicy.ProcessingTime:
-                    if (dt.TimeStamp.Subtract(LastIssueTime) >= WatermarkIssuePeriod())
+                    if (dt.ProcessingTime.Subtract(LastIssueTime) >= WatermarkIssuePeriod())
                     {
                         await SendToNextStreamWatermark(new Watermark(DateTime.Now), GetMetadata());
-                        LastIssueTime = dt.TimeStamp;
+                        LastIssueTime = dt.ProcessingTime;
                     }
                     break;
                 default:

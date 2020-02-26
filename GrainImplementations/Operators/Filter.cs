@@ -20,7 +20,7 @@ namespace GrainImplementations.Operators
         {
             if (Apply(input.Value)) 
             {
-                input.TimeStamp = DateTime.Now;
+                input.ProcessingTime = DateTime.Now;
 
                 await SendToNextStreamData(input.Key, input, GetMetadata());
             }

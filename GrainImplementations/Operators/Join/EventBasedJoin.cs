@@ -36,7 +36,7 @@ namespace GrainImplementations.Operators.Join
             (object input, Metadata metadata) = packedInput;
             if ((NextStreamIds.Count == 0 || NextStreamGuid == null) && !Last)
             {
-                var result = await GrainFactory.GetGrain<IJob>(JobMgrId, JobMgrType.FullName).GetOutputStreams(this.GetPrimaryKey(), GetType());
+                var result = await GrainFactory.GetGrain<IJob>(Oicfg.JobManagerGuid, Oicfg.JobManagerType.FullName).GetOutputStreams(this.GetPrimaryKey(), GetType());
                 if (result.HasValue)
                 {
                     NextStreamGuid = result.Value.Item1;

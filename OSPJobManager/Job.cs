@@ -25,7 +25,15 @@ namespace OSPJobManager
                 var curr = s;
                 foreach (var guid in curr.OperatorGUIDs)
                 {
-                    await GrainFactory.GetGrain<IOperator>(guid, curr.OperatorType.FullName).Init(this.GetPrimaryKey(), GetType(), s.Partitioner);
+                    var ocfg = new OperatorInitConfig()
+                    {
+                        JobManagerGuid = this.GetPrimaryKey(),
+                        JobManagerType = this.GetType(),
+                        TimeCharacteristic = tpm.Conf.TimeCharacteristic,
+                        ProcessingType = tpm.Conf.ProcessingType,
+                        Partitioner = s.Partitioner
+                    };
+                    await GrainFactory.GetGrain<IOperator>(guid, curr.OperatorType.FullName).Init(ocfg);
                 }
             }
         }

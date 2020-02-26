@@ -1,9 +1,7 @@
-﻿using CoreOSP.Models;
+﻿using CoreOSP;
+using CoreOSP.Models;
 using Orleans;
 using Orleans.Streams;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GrainInterfaces.Operators
@@ -11,7 +9,7 @@ namespace GrainInterfaces.Operators
     public interface IOperator : IGrainWithGuidKey
     {
         Task Process((object, Metadata) packedInput, StreamSequenceToken sequenceToken);
-        Task Init(Guid jobMgrId, Type jobMgrType, Type delegator);
+        Task Init(OperatorInitConfig operatorInitConfig);
         Task GetSubscribedStreams();
     }
 }

@@ -9,17 +9,23 @@ namespace CoreOSP.Models
     {
         public object Key { get; set; }
         public V Value { get; set; }
-        
-        public static explicit operator Data<object>(Data<V> x) => new Data<object>(x.Key, x.Value) { TimeStamp = x.TimeStamp};
-        
-        [ProcessingTime]
-        public DateTime TimeStamp { get; set; }
+ 
+        public DateTime ProcessingTime { get; set; }
+
+        public DateTime IngestionTime { get; private set; }
 
         public Data(object key, V val)
         {
             Key = key;
             Value = val;
-            TimeStamp = DateTime.Now;
+            ProcessingTime = DateTime.Now;
+        }
+        public Data(object key, V val, DateTime ingestionTime)
+        {
+            Key = key;
+            Value = val;
+            ProcessingTime = DateTime.Now;
+            IngestionTime = ingestionTime;
         }
 
         public DateTime GetTime(TimePolicy policy) 
@@ -34,7 +40,7 @@ namespace CoreOSP.Models
                     time = (DateTime)value;
                     break;
                 case TimePolicy.ProcessingTime:
-                    time = TimeStamp;
+                    time = ProcessingTime;
                     break;
                 default: 
                     throw new ArgumentException("Such Time policy not suported");
