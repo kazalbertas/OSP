@@ -8,14 +8,14 @@ namespace OSPTests.TestWindowJoin
 {
     public class WindowJoin : TumblingWindowJoin<Test, Test2>
     {
-        public override DateTime ExtractTimestamp(Data<Test> input)
+        public override DateTime ExtractEventTime(Test input)
         {
-            return input.Value.EventTime;
+            return input.EventTime;
         }
 
-        public override DateTime ExtractTimestamp(Data<Test2> input)
+        public override DateTime ExtractEventTime(Test2 input)
         {
-            return input.Value.EventTime;
+            return input.EventTime;
         }
 
         public override TimeSpan GetWindowSize()

@@ -1,4 +1,5 @@
-﻿using CoreOSP.Models;
+﻿using CoreOSP;
+using CoreOSP.Models;
 using GrainInterfaces.Operators;
 using Orleans;
 using Orleans.Streams;
@@ -63,8 +64,8 @@ namespace GrainImplementations.Operators.Join
 
         internal void RemoveOutsideWindowData(DateTime newWindowStart)
         {
-            sourceAInput = sourceAInput.Where(x => ExtractTimestamp(x) >= newWindowStart).ToList();
-            sourceBInput = sourceBInput.Where(x => ExtractTimestamp(x) >= newWindowStart).ToList();
+            sourceAInput = sourceAInput.Where(x => ExtractDateTime(x) >= newWindowStart).ToList();
+            sourceBInput = sourceBInput.Where(x => ExtractDateTime(x) >= newWindowStart).ToList();
         }
 
         public Task SetSources(List<Guid> sourceA, List<Guid> sourceB)
@@ -83,7 +84,31 @@ namespace GrainImplementations.Operators.Join
             return TimeSpan.Zero;
         }
 
-        public abstract DateTime ExtractTimestamp(Data<T> input);
-        public abstract DateTime ExtractTimestamp(Data<K> input);
+        protected DateTime ExtractDateTime(Data<T> input)
+        {
+            var dt = Oicfg.TimeCharacteristic switch
+            {
+                (TimePolicy.EventTime) => ExtractEventTime(input.Value),
+                (TimePolicy.ProcessingTime) => input.ProcessingTime,
+                (TimePolicy.None) => throw new MissingMemberException("Join requires not none time characteristic"),
+                _ => throw new NotSupportedException("Time characteristic not supported"),
+            };
+            return dt;
+        }
+
+        protected DateTime ExtractDateTime(Data<K> input)
+        {
+            var dt = Oicfg.TimeCharacteristic switch
+            {
+                (TimePolicy.EventTime) => ExtractEventTime(input.Value),
+                (TimePolicy.ProcessingTime) => input.ProcessingTime,
+                (TimePolicy.None) => throw new MissingMemberException("Join requires not none time characteristic"),
+                _ => throw new NotSupportedException("Time characteristic not supported"),
+            };
+            return dt;
+        }
+
+        public abstract DateTime ExtractEventTime(T input);
+        public abstract DateTime ExtractEventTime(K input);
     }
 }

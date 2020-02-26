@@ -58,10 +58,10 @@ namespace GrainImplementations.Operators
             {
                 case TimePolicy.EventTime:
 
-                    if (ExtractTimestamp(dt.Value).Subtract(LastIssueTime) >= WatermarkIssuePeriod())
+                    if (ExtractEventTime(dt.Value).Subtract(LastIssueTime) >= WatermarkIssuePeriod())
                     {
                         await SendToNextStreamWatermark(GenerateWatermark(dt.Value), GetMetadata());
-                        LastIssueTime = ExtractTimestamp(dt.Value);
+                        LastIssueTime = ExtractEventTime(dt.Value);
                     }
                     break;
 
@@ -78,13 +78,13 @@ namespace GrainImplementations.Operators
 
         }
 
-        public abstract DateTime ExtractTimestamp(T data);
+        public abstract DateTime ExtractEventTime(T data);
         public abstract TimeSpan MaxOutOfOrder();
         public abstract TimeSpan WatermarkIssuePeriod();
 
         public virtual Watermark GenerateWatermark(T input) 
         {
-            return new Watermark(ExtractTimestamp(input).Subtract(MaxOutOfOrder()));
+            return new Watermark(ExtractEventTime(input).Subtract(MaxOutOfOrder()));
         }
     }
 }

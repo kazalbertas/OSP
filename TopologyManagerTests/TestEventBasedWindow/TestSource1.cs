@@ -10,7 +10,7 @@ namespace OSPTests.TestEventBasedWindow
 {
     public class TestSource1 : Source<TerminationEvent>
     {
-        public override DateTime ExtractTimestamp(TerminationEvent data)
+        public override DateTime ExtractEventTime(TerminationEvent data)
         {
             return data.TimeStamp;
         }

@@ -8,7 +8,7 @@ namespace OSPTests.TestOperators.TestTopologyMockOperators
 {
     public class MockSource : Source<int>
     {
-        public override DateTime ExtractTimestamp(int data)
+        public override DateTime ExtractEventTime(int data)
         {
             throw new NotImplementedException();
         }

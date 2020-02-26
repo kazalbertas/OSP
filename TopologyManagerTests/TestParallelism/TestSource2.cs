@@ -9,7 +9,7 @@ namespace OSPTests.TestParallelism
 {
     public class TestSource2 : Source<string>
     {
-        public override DateTime ExtractTimestamp(string data)
+        public override DateTime ExtractEventTime(string data)
         {
             throw new NotImplementedException();
         }

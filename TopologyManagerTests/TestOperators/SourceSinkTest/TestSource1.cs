@@ -14,7 +14,7 @@ namespace OSPTests.TestOperators.SourceSinkTest
 {
     public class TestSource1 : Source<string>
     {
-        public override DateTime ExtractTimestamp(string data)
+        public override DateTime ExtractEventTime(string data)
         {
             throw new NotImplementedException();
         }

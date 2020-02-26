@@ -7,7 +7,7 @@ namespace UserGrainImplementations
 {
     public class TestSourceA : SourceSMSProvider<string>
     {
-        public override DateTime ExtractTimestamp(string data)
+        public override DateTime ExtractEventTime(string data)
         {
             throw new NotImplementedException();
         }

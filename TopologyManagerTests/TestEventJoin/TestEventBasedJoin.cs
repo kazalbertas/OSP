@@ -9,12 +9,12 @@ namespace OSPTests.TestEventJoin
 {
     public class TestEventBasedJoin : EventBasedJoin<Test,Test2>
     {
-        public override DateTime ExtractDateTime(Test input)
+        public override DateTime ExtractEventTime(Test input)
         {
             return input.EventTime;
         }
 
-        public override DateTime ExtractDateTime(Test2 input)
+        public override DateTime ExtractEventTime(Test2 input)
         {
             return input.EventTime;
         }

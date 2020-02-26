@@ -10,7 +10,7 @@ namespace OSPTests.TestEventJoin
 {
     public class TerminationSource : Source<TerminationEvent>
     {
-        public override DateTime ExtractTimestamp(TerminationEvent data)
+        public override DateTime ExtractEventTime(TerminationEvent data)
         {
             return data.TimeStamp;
         }

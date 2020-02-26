@@ -16,7 +16,7 @@ namespace OSPTests.TestWatermarks
 
     public class TestSource1 : Source<TestObject>
     {
-        public override DateTime ExtractTimestamp(TestObject data)
+        public override DateTime ExtractEventTime(TestObject data)
         {
             return data.TimeStamp;
         }

@@ -23,14 +23,14 @@ namespace GrainImplementations.Operators.Join
 
         public override async Task ProcessData(Data<K> input, Metadata metadata)
         {
-            if (WindowStart == DateTime.MinValue) WindowStart = ExtractTimestamp(input);
-            if (WatermarkB.Subtract(AllowedLateness()) <= ExtractTimestamp(input))
+            if (WindowStart == DateTime.MinValue) WindowStart = ExtractDateTime(input);
+            if (WatermarkB.Subtract(AllowedLateness()) <= ExtractDateTime(input))
             {
                 sourceBInput.Add(input);
                 //Join data
-                if (ExtractTimestamp(input) < WindowStart.Add(GetWindowSize()))
+                if (ExtractDateTime(input) < WindowStart.Add(GetWindowSize()))
                 {
-                    var sourceAWithSameKey = sourceAInput.Where(x => x.Key.Equals(input.Key) && (ExtractTimestamp(x) < WindowStart.Add(GetWindowSize()))).ToList();
+                    var sourceAWithSameKey = sourceAInput.Where(x => x.Key.Equals(input.Key) && (ExtractDateTime(x) < WindowStart.Add(GetWindowSize()))).ToList();
                     foreach (var aIn in sourceAWithSameKey)
                     {
                         var dt = new Data<(T, K)>(input.Key, (aIn.Value, input.Value));
@@ -42,13 +42,13 @@ namespace GrainImplementations.Operators.Join
 
         public override async Task ProcessData(Data<T> input, Metadata metadata)
         {
-            if (WindowStart == DateTime.MinValue) WindowStart = ExtractTimestamp(input);
-            if (WatermarkA.Subtract(AllowedLateness()) <= ExtractTimestamp(input))
+            if (WindowStart == DateTime.MinValue) WindowStart = ExtractDateTime(input);
+            if (WatermarkA.Subtract(AllowedLateness()) <= ExtractDateTime(input))
             {
                 sourceAInput.Add(input);
-                if (ExtractTimestamp(input) < WindowStart.Add(GetWindowSize()))
+                if (ExtractDateTime(input) < WindowStart.Add(GetWindowSize()))
                 {
-                    var sourceBWithSameKey = sourceBInput.Where(x => x.Key.Equals(input.Key) && (ExtractTimestamp(x) < WindowStart.Add(GetWindowSize()))).ToList();
+                    var sourceBWithSameKey = sourceBInput.Where(x => x.Key.Equals(input.Key) && (ExtractDateTime(x) < WindowStart.Add(GetWindowSize()))).ToList();
 
                     foreach (var bIn in sourceBWithSameKey)
                     {

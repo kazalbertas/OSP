@@ -10,7 +10,7 @@ namespace OSPTests.TestWindowJoin
 {
     public class TestSource1 : Source<Test2>
     {
-        public override DateTime ExtractTimestamp(Test2 data)
+        public override DateTime ExtractEventTime(Test2 data)
         {
             return data.EventTime;
         }

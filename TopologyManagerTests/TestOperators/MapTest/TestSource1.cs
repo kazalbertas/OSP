@@ -14,7 +14,7 @@ namespace OSPTests.TestOperators.MapTest
 {
     public class TestSource1 : Source<TypeA>
     {
-        public override DateTime ExtractTimestamp(TypeA data)
+        public override DateTime ExtractEventTime(TypeA data)
         {
             throw new NotImplementedException();
         }

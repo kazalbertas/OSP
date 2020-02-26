@@ -123,21 +123,13 @@ namespace TopologyManagerOSP.Operators
 
         private void SetPartitioner(PartitionPolicy partitionPolicy)
         {
-            switch (partitionPolicy)
+            Partitioner = partitionPolicy switch
             {
-                case PartitionPolicy.RoundRobin:
-                    Partitioner = typeof(RoundRobinPartitioner);
-                    break;
-                case PartitionPolicy.Random:
-                    Partitioner = typeof(RandomPartitioner);
-                    break;
-                case PartitionPolicy.Key:
-                    Partitioner = typeof(KeyPartitioner);
-                    break;
-                default: throw new ArgumentOutOfRangeException("Not supported partitioning function");
-
-            }
-
+                PartitionPolicy.RoundRobin => typeof(RoundRobinPartitioner),
+                PartitionPolicy.Random => typeof(RandomPartitioner),
+                PartitionPolicy.Key => typeof(KeyPartitioner),
+                _ => throw new ArgumentOutOfRangeException("Not supported partitioning function"),
+            };
         }
     }
 }

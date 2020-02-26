@@ -9,7 +9,7 @@ namespace UserGrainImplementations
 {
     public class TestSource : Source<int>
     {
-        public override DateTime ExtractTimestamp(int data)
+        public override DateTime ExtractEventTime(int data)
         {
             throw new NotImplementedException();
         }

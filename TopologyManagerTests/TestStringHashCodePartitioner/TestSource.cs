@@ -9,7 +9,7 @@ namespace OSPTests.TestStringHashCodePartitioner
 {
     public class TestSource : Source<string>
     {
-        public override DateTime ExtractTimestamp(string data)
+        public override DateTime ExtractEventTime(string data)
         {
             throw new NotImplementedException();
         }
