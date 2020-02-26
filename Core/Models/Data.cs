@@ -12,20 +12,11 @@ namespace CoreOSP.Models
  
         public DateTime ProcessingTime { get; set; }
 
-        public DateTime IngestionTime { get; private set; }
-
         public Data(object key, V val)
         {
             Key = key;
             Value = val;
             ProcessingTime = DateTime.Now;
-        }
-        public Data(object key, V val, DateTime ingestionTime)
-        {
-            Key = key;
-            Value = val;
-            ProcessingTime = DateTime.Now;
-            IngestionTime = ingestionTime;
         }
 
         public DateTime GetTime(TimePolicy policy) 

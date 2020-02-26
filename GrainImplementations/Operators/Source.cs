@@ -47,7 +47,6 @@ namespace GrainImplementations.Operators
                     _partitioner.SetOutputStreams(NextStreamGuid, NextStreamIds);
                 }
                 else throw new ArgumentNullException("No next operator found, check topology");
-                // Need to keep null types in case of sink,
             }
         }
 
