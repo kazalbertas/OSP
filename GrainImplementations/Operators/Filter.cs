@@ -26,10 +26,5 @@ namespace GrainImplementations.Operators
             }
         }
 
-        public override Task ProcessWatermark(Watermark wm, Metadata metadata)
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

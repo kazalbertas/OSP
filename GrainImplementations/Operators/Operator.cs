@@ -46,11 +46,30 @@ namespace GrainImplementations.Operators
                 else throw new ArgumentNullException("No next operator found, check topology");
                 // Need to keep null types in case of sink,
             }
-            if (input is Data<TerminationEvent>) await ProcessTerminationEvent(input as Data<TerminationEvent>);
-            else if (input is Watermark) await ProcessWatermark(input as Watermark, metadata);
-            else if (input is Checkpoint) await ProcessCheckpoint(input as Checkpoint, metadata);
-            else if (input is Data<T>) await ProcessData((Data<T>)input, metadata);
-            else throw new ArgumentException("Argument is not of type " + typeof(T).FullName);
+            switch (Oicfg.ProcessingType) 
+            {
+                case ProcessingType.SynchronizeEach: 
+                    {
+                        if (input is Data<TerminationEvent>) await ProcessTerminationEvent(input as Data<TerminationEvent>);
+                        else if (input is Watermark) await ProcessWatermark(input as Watermark, metadata);
+                        else if (input is Checkpoint) await ProcessCheckpoint(input as Checkpoint, metadata);
+                        else if (input is Data<T>) await ProcessData((Data<T>)input, metadata);
+                        else throw new ArgumentException("Argument is not of type " + typeof(T).FullName);
+                        break;
+                    }
+                case ProcessingType.Asynchronous:
+                    {
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                        if (input is Data<TerminationEvent>) ProcessTerminationEvent(input as Data<TerminationEvent>);
+                        else if (input is Watermark) ProcessWatermark(input as Watermark, metadata);
+                        else if (input is Checkpoint) ProcessCheckpoint(input as Checkpoint, metadata);
+                        else if (input is Data<T>) ProcessData((Data<T>)input, metadata);
+                        else throw new ArgumentException("Argument is not of type " + typeof(T).FullName);
+                        break;
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    }
+            }
+            
             //return Task.CompletedTask;
         }
 
@@ -88,13 +107,9 @@ namespace GrainImplementations.Operators
 
         public abstract Task ProcessData(Data<T> input, Metadata metadata);
 
-        public virtual Task ProcessWatermark(Watermark wm, Metadata metadata) 
+        public virtual async Task ProcessWatermark(Watermark wm, Metadata metadata) 
         {
-            // foreach (var i in NextIds)
-            // {
-            //GrainFactory.GetGrain<IOperator>(i, NextType.FullName).Process(wm, GetMetadata());
-            //}
-            return Task.CompletedTask;
+            await SendToNextStreamWatermark(wm, GetMetadata());
         }
 
         public virtual Task ProcessCheckpoint(Checkpoint cp, Metadata metadata) 
