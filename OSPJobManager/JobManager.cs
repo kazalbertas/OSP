@@ -17,8 +17,11 @@ namespace OSPJobManager
             {
                 if (stream.OperatorType.GetInterfaces().Contains(typeof(IWindowJoin)))
                 {
-                    var window = client.GetGrain<IWindowJoin>(stream.OperatorGUIDs.First(), stream.OperatorType.FullName);
-                    await window.SetSources(stream.Prev.SelectMany(x => x.OperatorGUIDs).ToList(), stream.SourceBPrev.SelectMany(x => x.OperatorGUIDs).ToList());
+                    foreach (var g in stream.OperatorGUIDs)
+                    {
+                        var window = client.GetGrain<IWindowJoin>(g, stream.OperatorType.FullName);
+                        await window.SetSources(stream.Prev.SelectMany(x => x.OperatorGUIDs).ToList(), stream.SourceBPrev.SelectMany(x => x.OperatorGUIDs).ToList());
+                    }
                 }
 
                 if (stream.OperatorType.GetInterfaces().Contains(typeof(ISource)))
