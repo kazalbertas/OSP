@@ -8,7 +8,15 @@ using System.Threading.Tasks;
 
 namespace GrainImplementations.Operators
 {
-    public abstract class Source<T> : Operator<T>, ISource
+    public abstract class Source<T> : Source<T, T>
+    {
+        public override T Map(T input)
+        {
+            return input;
+        }
+    }
+
+    public abstract class Source<T,K> : Operator<T>, ISource
     {
         public override Task ProcessCheckpoint(Checkpoint cp, Metadata metadata)
         {
@@ -28,7 +36,7 @@ namespace GrainImplementations.Operators
         public abstract Task Start();
 
         public abstract T ProcessMessage(string message);
-        public abstract object GetKey(T input);
+        public abstract object GetKey(K input);
 
         public DateTime PreviousTime;
         public DateTime LastIssueTime { get; set; } = DateTime.MinValue;
@@ -50,7 +58,7 @@ namespace GrainImplementations.Operators
             }
         }
 
-        public async Task SendMessageToStream(Data<T> dt)
+        public async Task SendMessageToStream(Data<K> dt)
         {
             await SendToNextStreamData(dt.Key, dt, GetMetadata());
 
@@ -78,13 +86,19 @@ namespace GrainImplementations.Operators
 
         }
 
-        public abstract DateTime ExtractEventTime(T data);
+        public abstract DateTime ExtractEventTime(K data);
         public abstract TimeSpan MaxOutOfOrder();
         public abstract TimeSpan WatermarkIssuePeriod();
-
-        public virtual Watermark GenerateWatermark(T input) 
+        public abstract K Map(T input);
+        
+        public virtual Watermark GenerateWatermark(K input) 
         {
             return new Watermark(ExtractEventTime(input).Subtract(MaxOutOfOrder()));
+        }
+
+        public virtual bool Filter(T input)
+        {
+            return true;
         }
     }
 }

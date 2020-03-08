@@ -9,22 +9,22 @@ using System.Threading.Tasks;
 
 namespace GrainImplementations.Operators
 {
-    public abstract class SourceKafkaProvider<T> : Source<T>
+    public abstract class SourceKafkaProvider<T> : SourceKafkaProvider<T, T>
+    {
+        public override T Map(T input)
+        {
+            return input;
+        }
+    }
+
+    public abstract class SourceKafkaProvider<T,K> : Source<T,K>
     {
         public override async Task Start()
         {
-            Subscib();
+            Subscibe();
         }
 
-        private Task OnNextMessage(string message, StreamSequenceToken sequenceToken)
-        {
-            T item = ProcessMessage(message);
-            Data<T> dt = new Data<T>(GetKey(item), item);
-            SendMessageToStream(dt);
-            return Task.CompletedTask;
-        }
-
-        private async Task Subscib() 
+        private async Task Subscibe() 
         {
             var conf = new ConsumerConfig
             {
@@ -51,9 +51,13 @@ namespace GrainImplementations.Operators
                         try
                         {
                             var cr = c.Consume(cts.Token);
-                            T item = ProcessMessage(cr.Value);
-                            Data<T> dt = new Data<T>(GetKey(item), item);
-                            await SendMessageToStream(dt);
+                            var processedMsg = ProcessMessage(cr.Value);
+                            if (Filter(processedMsg))
+                            {
+                                K item = Map(processedMsg);
+                                Data<K> dt = new Data<K>(GetKey(item), item);
+                                await SendMessageToStream(dt);
+                            }
                         }
                         catch (ConsumeException e)
                         {
