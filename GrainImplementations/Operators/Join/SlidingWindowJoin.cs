@@ -7,7 +7,15 @@ using System.Threading.Tasks;
 
 namespace GrainImplementations.Operators.Join
 {
-    public abstract class SlidingWindowJoin<T,K> : WindowJoin<T,K>
+    public abstract class SlidingWindowJoin<T, K> : SlidingWindowJoin<T, K, (T, K)>
+    {
+        public override (T, K) Map(T inputA, K inputB)
+        {
+            return (inputA, inputB);
+        }
+    }
+
+    public abstract class SlidingWindowJoin<T,K,O> : WindowJoin<T,K>
     {
         public abstract TimeSpan GetWindowSize();
         public abstract TimeSpan GetSlideSize();
@@ -52,11 +60,20 @@ namespace GrainImplementations.Operators.Join
 
                     foreach (var bIn in sourceBWithSameKey)
                     {
-                        var dt = new Data<(T, K)>(input.Key, (input.Value, bIn.Value));
-                        await SendToNextStreamData(input.Key, dt, GetMetadata());
+                        if (Filter(input.Value, bIn.Value))
+                        {
+                            var dt = new Data<O>(input.Key, Map(input.Value, bIn.Value));
+                            await SendToNextStreamData(input.Key, dt, GetMetadata());
+                        }
                     }
                 }
             }
         }
+
+        public virtual bool Filter(T inputA, K inputB) 
+        {
+            return true;
+        }
+        public abstract O Map(T inputA, K inputB);
     }
 }

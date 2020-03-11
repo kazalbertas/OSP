@@ -66,6 +66,7 @@ namespace GrainImplementations.Operators.Join
                 WatermarkB = wm.TimeStamp;
             }
 
+            //remove
             if (WatermarkA == new DateTime(2019, 10, 10, 10, 10, 13) && WatermarkB == new DateTime(2019, 10, 10, 10, 10, 13))
             {
                 Console.WriteLine("aa");
