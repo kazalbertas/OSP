@@ -60,8 +60,8 @@ namespace GrainImplementations.Operators
 
         public async Task SendMessageToStream(Data<K> dt)
         {
+            //await SendToNextStreamData(dt.Key, dt, GetMetadata());
             await SendToNextStreamData(dt.Key, dt, GetMetadata());
-
             switch (Policy)
             {
                 case TimePolicy.EventTime:
@@ -87,8 +87,10 @@ namespace GrainImplementations.Operators
         }
 
         public abstract DateTime ExtractEventTime(K data);
+        /* OPTIMIZE */
         public abstract TimeSpan MaxOutOfOrder();
         public abstract TimeSpan WatermarkIssuePeriod();
+        /* END OPTIMIZE */
         public abstract K Map(T input);
         
         public virtual Watermark GenerateWatermark(K input) 

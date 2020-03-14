@@ -24,9 +24,9 @@ namespace GrainImplementations.Operators.Join
         private List<Guid> SourceA;
         private List<Guid> SourceB;
 
-        protected List<Data<T>> sourceAInput = new List<Data<T>>();
-        protected List<Data<K>> sourceBInput = new List<Data<K>>();
-
+        protected Dictionary<object,List<Data<T>>> sourceAInput = new Dictionary<object, List<Data<T>>>();
+        protected Dictionary<object,List<Data<K>>> sourceBInput = new Dictionary<object, List<Data<K>>>();
+        
         private List<TerminationEvent> TerminationEvent { get; } = new List<TerminationEvent>();
 
         internal DateTime WatermarkA = DateTime.MinValue;
@@ -66,12 +66,6 @@ namespace GrainImplementations.Operators.Join
                 WatermarkB = wm.TimeStamp;
             }
 
-            //remove
-            if (WatermarkA == new DateTime(2019, 10, 10, 10, 10, 13) && WatermarkB == new DateTime(2019, 10, 10, 10, 10, 13))
-            {
-                Console.WriteLine("aa");
-            }
-
             foreach (var e in TerminationEvent.ToArray())
             {
                 if (e.TimeStamp <= WatermarkA && e.TimeStamp <= WatermarkB)
@@ -85,37 +79,66 @@ namespace GrainImplementations.Operators.Join
 
         public override async Task ProcessData(Data<T> input, Metadata metadata)
         {
-            sourceAInput.Add(input);
-
-            var sourceBWithSameKey = sourceBInput.Where(x => x.Key.Equals(input.Key)).ToList();
-            foreach (var bIn in sourceBWithSameKey)
+            if (sourceAInput.ContainsKey(input.Key))
             {
-                if (Filter(input.Value, bIn.Value))
+                sourceAInput[input.Key].Add(input);
+            }
+            else
+            {
+                sourceAInput.Add(input.Key, new List<Data<T>>() { input });
+            }
+
+            if (sourceBInput.ContainsKey(input.Key))
+            {
+                var sourceBWithSameKey = sourceBInput[input.Key];
+                foreach (var bIn in sourceBWithSameKey)
                 {
-                    var dt = new Data<O>(input.Key, Map(input.Value, bIn.Value));
-                    await SendToNextStreamData(input.Key, dt, GetMetadata());
+                    if (Filter(input.Value, bIn.Value))
+                    {
+                        var dt = new Data<O>(input.Key, Map(input.Value, bIn.Value));
+                        await SendToNextStreamData(input.Key, dt, GetMetadata());
+                    }
                 }
             }
         }
 
         public async Task ProcessData(Data<K> input, Metadata metadata)
         {
-            sourceBInput.Add(input);
-            var sourceAWithSameKey = sourceAInput.Where(x => x.Key.Equals(input.Key)).ToList();
-            foreach (var aIn in sourceAWithSameKey)
+            if (sourceBInput.ContainsKey(input.Key))
             {
-                if (Filter(aIn.Value, input.Value))
+                sourceBInput[input.Key].Add(input);
+            }
+            else
+            {
+                sourceBInput.Add(input.Key, new List<Data<K>>() { input });
+            }
+
+            if (sourceAInput.ContainsKey(input.Key))
+            {
+                var sourceAWithSameKey = sourceAInput[input.Key];
+                foreach (var aIn in sourceAWithSameKey)
                 {
-                    var dt = new Data<O>(input.Key, Map(aIn.Value, input.Value));
-                    await SendToNextStreamData(input.Key, dt, GetMetadata());
+                    if (Filter(aIn.Value, input.Value))
+                    {
+                        var dt = new Data<O>(input.Key, Map(aIn.Value, input.Value));
+                        await SendToNextStreamData(input.Key, dt, GetMetadata());
+                    }
                 }
             }
         }
 
         private void RemoveProcessed(object key, DateTime timestamp)
         {
-            sourceAInput.RemoveAll(x => x.Key.Equals(key) && ExtractDateTime(x) <= timestamp);
-            sourceBInput.RemoveAll(x => x.Key.Equals(key) && ExtractDateTime(x) <= timestamp);
+            sourceAInput[key].RemoveAll(x => ExtractDateTime(x) <= timestamp);
+            if (sourceAInput[key].Count == 0) 
+            {
+                sourceAInput.Remove(key);
+            }
+            sourceBInput[key].RemoveAll(x => ExtractDateTime(x) <= timestamp);
+            if (sourceBInput[key].Count == 0)
+            {
+                sourceBInput.Remove(key);
+            }
         }
 
         public override Task ProcessTerminationEvent(Data<TerminationEvent> tevent)
