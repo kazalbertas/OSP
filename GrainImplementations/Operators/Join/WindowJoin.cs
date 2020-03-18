@@ -16,8 +16,8 @@ namespace GrainImplementations.Operators.Join
         private List<Guid> SourceA;
         private List<Guid> SourceB;
 
-        protected List<Data<T>> sourceAInput = new List<Data<T>>();
-        protected List<Data<K>> sourceBInput = new List<Data<K>>();
+        protected Dictionary<object,List<Data<T>>> sourceAInput = new Dictionary<object, List<Data<T>>>();
+        protected Dictionary<object, List<Data<K>>> sourceBInput = new Dictionary<object, List<Data<K>>>();
 
         internal DateTime WindowStart = DateTime.MinValue;
         internal DateTime WatermarkA = DateTime.MinValue;
@@ -64,8 +64,17 @@ namespace GrainImplementations.Operators.Join
 
         internal void RemoveOutsideWindowData(DateTime newWindowStart)
         {
-            sourceAInput = sourceAInput.Where(x => ExtractDateTime(x) >= newWindowStart).ToList();
-            sourceBInput = sourceBInput.Where(x => ExtractDateTime(x) >= newWindowStart).ToList();
+            foreach (var key in sourceAInput.Keys)
+            {
+                sourceAInput[key].RemoveAll(x => ExtractDateTime(x) >= newWindowStart);
+            
+            }
+
+            foreach (var key in sourceBInput.Keys)
+            {
+                sourceBInput[key].RemoveAll(x => ExtractDateTime(x) >= newWindowStart);
+
+            }
         }
 
         public Task SetSources(List<Guid> sourceA, List<Guid> sourceB)

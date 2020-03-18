@@ -34,15 +34,27 @@ namespace GrainImplementations.Operators.Join
             if (WindowStart == DateTime.MinValue) WindowStart = ExtractDateTime(input);
             if (WatermarkB.Subtract(AllowedLateness()) <= ExtractDateTime(input))
             {
-                sourceBInput.Add(input);
+
+                if (sourceBInput.ContainsKey(input.Key))
+                {
+                    sourceBInput[input.Key].Add(input);
+                }
+                else
+                {
+                    sourceBInput.Add(input.Key, new List<Data<K>>() { input });
+                }
+
                 //Join data
                 if (ExtractDateTime(input) < WindowStart.Add(GetWindowSize()))
                 {
-                    var sourceAWithSameKey = sourceAInput.Where(x => x.Key.Equals(input.Key) && (ExtractDateTime(x) < WindowStart.Add(GetWindowSize()))).ToList();
-                    foreach (var aIn in sourceAWithSameKey)
+                    if (sourceAInput.ContainsKey(input.Key))
                     {
-                        var dt = new Data<(T, K)>(input.Key, (aIn.Value, input.Value));
-                        await SendToNextStreamData(input.Key, dt, GetMetadata());
+                        var sourceAWithSameKey = sourceAInput[input.Key].Where(x => (ExtractDateTime(x) < WindowStart.Add(GetWindowSize()))).ToList();
+                        foreach (var aIn in sourceAWithSameKey)
+                        {
+                            var dt = new Data<(T, K)>(input.Key, (aIn.Value, input.Value));
+                            await SendToNextStreamData(input.Key, dt, GetMetadata());
+                        }
                     }
                 }
             }
@@ -53,17 +65,27 @@ namespace GrainImplementations.Operators.Join
             if (WindowStart == DateTime.MinValue) WindowStart = ExtractDateTime(input);
             if (WatermarkA.Subtract(AllowedLateness()) <= ExtractDateTime(input))
             {
-                sourceAInput.Add(input);
+                if (sourceAInput.ContainsKey(input.Key))
+                {
+                    sourceAInput[input.Key].Add(input);
+                }
+                else
+                {
+                    sourceAInput.Add(input.Key, new List<Data<T>>() { input });
+                }
                 if (ExtractDateTime(input) < WindowStart.Add(GetWindowSize()))
                 {
-                    var sourceBWithSameKey = sourceBInput.Where(x => x.Key.Equals(input.Key) && (ExtractDateTime(x) < WindowStart.Add(GetWindowSize()))).ToList();
-
-                    foreach (var bIn in sourceBWithSameKey)
+                    if (sourceBInput.ContainsKey(input.Key))
                     {
-                        if (Filter(input.Value, bIn.Value))
+                        var sourceBWithSameKey = sourceBInput[input.Key].Where(x => (ExtractDateTime(x) < WindowStart.Add(GetWindowSize()))).ToList();
+
+                        foreach (var bIn in sourceBWithSameKey)
                         {
-                            var dt = new Data<O>(input.Key, Map(input.Value, bIn.Value));
-                            await SendToNextStreamData(input.Key, dt, GetMetadata());
+                            if (Filter(input.Value, bIn.Value))
+                            {
+                                var dt = new Data<O>(input.Key, Map(input.Value, bIn.Value));
+                                await SendToNextStreamData(input.Key, dt, GetMetadata());
+                            }
                         }
                     }
                 }
