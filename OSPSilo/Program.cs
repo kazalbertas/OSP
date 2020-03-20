@@ -22,6 +22,7 @@ namespace OSPSilo
 
         private static async Task<int> RunMainAsync()
         {
+
             try
             {
                 var host = await StartSilo();

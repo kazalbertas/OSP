@@ -16,6 +16,7 @@ namespace TopologyManagerOSP.Operators
         public List<OperatorNode> Prev { get; private set; } = new List<OperatorNode>();
         public List<OperatorNode> SourceBPrev { get; private set; } = new List<OperatorNode>();
 
+        public Guid OperatorID { get; set; }
         public List<Guid> OperatorGUIDs { get; set; } = new List<Guid>();
         public Type OperatorType { get; set; }
         public ConfigurationBase Configuration { get; private set; }
@@ -36,6 +37,7 @@ namespace TopologyManagerOSP.Operators
         internal OperatorNode(TopologyManager mgr, Type t, int outputStreamCount, PartitionPolicy partitionPolicy)
         {
             OperatorGUIDs.Add(Guid.NewGuid());
+            OperatorID = Guid.NewGuid();
             OperatorType = t;
             StreamGUID = Guid.NewGuid();
             SetPartitioner(partitionPolicy);
@@ -51,6 +53,7 @@ namespace TopologyManagerOSP.Operators
                 OperatorGUIDs.Add(Guid.NewGuid());
             }
             Prev.Add(previous);
+            OperatorID = Guid.NewGuid();
             OperatorType = t;
             StreamGUID = Guid.NewGuid();
             Parallelism = parallelism;
@@ -67,6 +70,7 @@ namespace TopologyManagerOSP.Operators
                 OperatorGUIDs.Add(Guid.NewGuid());
             }
             Prev.Add(previous);
+            OperatorID = Guid.NewGuid();
             OperatorType = t;
             StreamGUID = Guid.NewGuid();
             Parallelism = parallelism;

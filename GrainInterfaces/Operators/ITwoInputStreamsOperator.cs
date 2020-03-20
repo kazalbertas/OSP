@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace GrainInterfaces.Operators
 {
-    public interface IWindowJoin : IOperator
+    public interface ITwoInputStreamsOperator : IOperator
     {
-        // Remove after Implementations refactored
         public Task SetSources(List<Guid> sourceA, List<Guid> sourceB);
     }
 }
