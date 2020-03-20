@@ -122,10 +122,6 @@ namespace GrainImplementations.Operators
 
         public virtual Task ProcessCheckpoint(Checkpoint cp, Metadata metadata) 
         {
-            //foreach (var i in NextIds) 
-            // {
-            //GrainFactory.GetGrain<IOperator>(i, NextType.FullName).Process(cp, GetMetadata());
-            //}
             return Task.CompletedTask;
         }
 
@@ -134,11 +130,11 @@ namespace GrainImplementations.Operators
             return Task.CompletedTask;
         }
 
-        public async Task SendToNextStreamData(object key, object obj, Metadata md) 
+        public async Task SendToNextStreamData(object key, object obj, Metadata md)
         {
             var next = _partitioner.GetNextStream(key);
             var streamProvider = GetStreamProvider("SMSProvider");
-            var stream = streamProvider.GetStream<(object,Metadata)>(next.Item1, next.Item2.ToString());
+            var stream = streamProvider.GetStream<(object, Metadata)>(next.Item1, next.Item2.ToString());
             await stream.OnNextAsync((obj, md));
         }
 

@@ -26,12 +26,11 @@ namespace GrainImplementations.Operators
             }
             await stream.SubscribeAsync(OnNextMessage);
         }
-        private Task OnNextMessage(string message, StreamSequenceToken sequenceToken)
+        private async Task OnNextMessage(string message, StreamSequenceToken sequenceToken)
         {           
             T item = ProcessMessage(message);
             Data<T> dt = new Data<T>(GetKey(item), item);
-            SendMessageToStream(dt);
-            return Task.CompletedTask;
+            await SendMessageToStream(dt);
         }
 
         public abstract Guid GetStreamID();
