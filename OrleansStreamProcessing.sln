@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OSPJobManager", "OSPJobMana
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OSPClient", "OSPClient\OSPClient.csproj", "{46350F08-AB78-4B9C-A0E7-84E1EA97846D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NemanFlowWebApp", "NemanFlowWebApp\NemanFlowWebApp.csproj", "{D863F18A-20E9-4DE4-A825-B7E3D75BA686}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{46350F08-AB78-4B9C-A0E7-84E1EA97846D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46350F08-AB78-4B9C-A0E7-84E1EA97846D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46350F08-AB78-4B9C-A0E7-84E1EA97846D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D863F18A-20E9-4DE4-A825-B7E3D75BA686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D863F18A-20E9-4DE4-A825-B7E3D75BA686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D863F18A-20E9-4DE4-A825-B7E3D75BA686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D863F18A-20E9-4DE4-A825-B7E3D75BA686}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
