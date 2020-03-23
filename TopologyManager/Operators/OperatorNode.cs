@@ -116,6 +116,14 @@ namespace TopologyManagerOSP.Operators
             return new OperatorNode(_mgr, this, t, parallelism, outputStreamCount, partitionPolicy);
         }
 
+        public OperatorNode Storage(Type t, int outputStreamCount, PartitionPolicy partitionPolicy = PartitionPolicy.RoundRobin)
+        {
+            // needs a check
+            //if (!DataStreamValidator.ValidateType<IStorage<T>>(t)) new OperatorMismatchException("Operator is not of type IFilter");
+
+            return new OperatorNode(_mgr, this, t, 1, outputStreamCount, partitionPolicy);
+        }
+
         public void AddInput(OperatorNode node) 
         {
             Prev.Add(node);
