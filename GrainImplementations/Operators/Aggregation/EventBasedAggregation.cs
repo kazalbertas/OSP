@@ -11,7 +11,7 @@ namespace GrainImplementations.Operators.Aggregation
     public abstract class EventBasedAggregation<T, K> : Operator<T>, IEventBasedAggregation
     {
 
-        private List<Data<T>> data = new List<Data<T>>();
+        private Dictionary<object,List<Data<T>>> data = new Dictionary<object, List<Data<T>>>();
 
         private DateTime Watermark { get; set; }
         private List<TerminationEvent> TerminationEvent { get;} = new List<TerminationEvent>();
@@ -35,9 +35,16 @@ namespace GrainImplementations.Operators.Aggregation
 
         public override async Task ProcessData(Data<T> input, Metadata metadata)
         {
-            data.RemoveAll(x => x.Key.Equals(input.Key) && CheckUpdateEvent(input.Value, x.Value));
-            data.Add(input);
-            var filteredData = data.FindAll(x => x.Key.Equals(input.Key));
+            if (data.ContainsKey(input.Key))
+            {
+                data[input.Key].RemoveAll(x => CheckUpdateEvent(input.Value, x.Value));
+                data[input.Key].Add(input);
+            }
+            else 
+            {
+                data.Add(input.Key, new List<Data<T>>() { input });
+            }
+            var filteredData = data[input.Key];
             var result = AggregateResults(filteredData.Select(x=>x.Value).ToList());
             if (Filter(result)) 
             {
@@ -47,7 +54,15 @@ namespace GrainImplementations.Operators.Aggregation
 
         private void RemoveProcessed(object key, DateTime timestamp) 
         {
-            data.RemoveAll(x => x.Key.Equals(key) && ExtractDateTime(x.Value) <= timestamp);
+            if (data.ContainsKey(key))
+            {
+                data[key].RemoveAll(x => ExtractDateTime(x.Value) <= timestamp);
+                if (data[key].Count == 0)
+                {
+                    data.Remove(key);
+                }
+            }
+            
         }
 
         public override Task ProcessTerminationEvent(Data<TerminationEvent> tevent)

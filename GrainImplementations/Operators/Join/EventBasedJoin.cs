@@ -129,15 +129,21 @@ namespace GrainImplementations.Operators.Join
 
         private void RemoveProcessed(object key, DateTime timestamp)
         {
-            sourceAInput[key].RemoveAll(x => ExtractDateTime(x) <= timestamp);
-            if (sourceAInput[key].Count == 0) 
+            if (sourceAInput.ContainsKey(key))
             {
-                sourceAInput.Remove(key);
+                sourceAInput[key].RemoveAll(x => ExtractDateTime(x) <= timestamp);
+                if (sourceAInput[key].Count == 0)
+                {
+                    sourceAInput.Remove(key);
+                }
             }
-            sourceBInput[key].RemoveAll(x => ExtractDateTime(x) <= timestamp);
-            if (sourceBInput[key].Count == 0)
+            if (sourceBInput.ContainsKey(key))
             {
-                sourceBInput.Remove(key);
+                sourceBInput[key].RemoveAll(x => ExtractDateTime(x) <= timestamp);
+                if (sourceBInput[key].Count == 0)
+                {
+                    sourceBInput.Remove(key);
+                }
             }
         }
 
