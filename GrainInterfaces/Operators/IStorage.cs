@@ -8,7 +8,7 @@ namespace GrainInterfaces.Operators
 {
     public interface IStorage : IOperator
     {
-        Task<object> Select(string functionName, object parameters);
+        Task<object> RunFunction(string functionName, string parameters);
 
         Task<string> GetName();
 

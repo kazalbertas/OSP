@@ -10,7 +10,7 @@ namespace GrainImplementations.Operators
 {
     public abstract class Storage<T> : Operator<T>, IStorage
     {
-        private Dictionary<string, Func<Dictionary<object, List<Data<T>>>, object, object>> functions = new Dictionary<string, Func<Dictionary<object, List<Data<T>>>, object, object>>();
+        private Dictionary<string, Func<Dictionary<object, List<Data<T>>>, string, object>> functions = new Dictionary<string, Func<Dictionary<object, List<Data<T>>>, string, object>>();
         private Dictionary<object, List<Data<T>>> storedValues { get; set; } = new Dictionary<object, List<Data<T>>>();
 
         public override Task OnActivateAsync()
@@ -32,9 +32,9 @@ namespace GrainImplementations.Operators
             await SendToNextStreamData(input.Key, input, GetMetadata());
         }
 
-        public abstract Dictionary<string, Func<Dictionary<object, List<Data<T>>>, object, object>> SetFunctions();
+        public abstract Dictionary<string, Func<Dictionary<object, List<Data<T>>>, string, object>> SetFunctions();
 
-        public Task<object> Select(string functionName, object parameters) 
+        public Task<object> RunFunction(string functionName, string parameters) 
         {
             return Task.FromResult(functions[functionName].Invoke(storedValues,parameters));
         }
