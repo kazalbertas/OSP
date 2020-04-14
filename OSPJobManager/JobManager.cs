@@ -45,10 +45,11 @@ namespace OSPJobManager
                 if (stream.OperatorType.GetInterfaces().Contains(typeof(ISource)))
                 {
                     var s = client.GetGrain<ISource>(stream.OperatorGUIDs.First(), stream.OperatorType.FullName);
-                    tasks.Add(s.Start());
+                    //tasks.Add(s.Start());
+                    s.Start();
                 }
             }
-            await Task.WhenAll(tasks);
+           // await Task.WhenAll(tasks);
         }
     }
 }
