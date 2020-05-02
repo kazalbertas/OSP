@@ -24,6 +24,8 @@ namespace GrainImplementations.Operators
 
         protected IPartitioner _partitioner;
 
+        private Dictionary<int, List<Task>> messages = new Dictionary<int, List<Task>>();
+
         public override Task OnActivateAsync()
         {
             if (GetType().GetInterfaces().Contains(typeof(ISink))) Last = true;
@@ -135,7 +137,39 @@ namespace GrainImplementations.Operators
             var next = _partitioner.GetNextStream(key);
             var streamProvider = GetStreamProvider("SMSProvider");
             var stream = streamProvider.GetStream<(object, Metadata)>(next.Item1, next.Item2.ToString());
-            await stream.OnNextAsync((obj, md));
+            //await stream.OnNextAsync((obj, md));
+            if (messages.ContainsKey(next.Item2))
+            {
+                var ml = messages[next.Item2];
+                ml.RemoveAll( x => x.IsCompleted);
+                if (ml.Count < 50) 
+                {
+                    var t = stream.OnNextAsync((obj, md));
+                    messages[next.Item2].Add(t);
+                }
+                else
+                {
+                    /*var throttling = true;
+                    while (throttling) 
+                    {*/
+                        await Task.WhenAny(ml.ToArray());
+                        ml.RemoveAll(x => x.IsCompleted);
+                        if (ml.Count < 50)
+                        {
+                            var t = stream.OnNextAsync((obj, md));
+                            ml.Add(t);
+                      //      throttling = false;
+                        }
+                    //}
+                }
+        
+            }
+            else 
+            {
+                var t = stream.OnNextAsync((obj, md));
+                messages.Add(next.Item2, new List<Task>() { t });
+            }
+
         }
 
         public async Task SendToNextStreamWatermark(Watermark wm, Metadata md) 
