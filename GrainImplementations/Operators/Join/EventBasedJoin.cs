@@ -96,13 +96,18 @@ namespace GrainImplementations.Operators.Join
                     if (Filter(input.Value, bIn.Value))
                     {
                         var dt = new Data<O>(input.Key, Map(input.Value, bIn.Value));
-                        await SendToNextStreamData(input.Key, dt, GetMetadata());
+                        dt.Key = GetKey(dt);
+                        await SendToNextStreamData(dt.Key, dt, GetMetadata());
                     }
                 }
             }
         }
+        public virtual object GetKey(Data<O> data) 
+        {
+            return data.Key;
+        }
 
-        public async Task ProcessData(Data<K> input, Metadata metadata)
+        public virtual async Task ProcessData(Data<K> input, Metadata metadata)
         {
             if (sourceBInput.ContainsKey(input.Key))
             {
@@ -121,7 +126,8 @@ namespace GrainImplementations.Operators.Join
                     if (Filter(aIn.Value, input.Value))
                     {
                         var dt = new Data<O>(input.Key, Map(aIn.Value, input.Value));
-                        await SendToNextStreamData(input.Key, dt, GetMetadata());
+                        dt.Key = GetKey(dt);
+                        await SendToNextStreamData(dt.Key, dt, GetMetadata());
                     }
                 }
             }
